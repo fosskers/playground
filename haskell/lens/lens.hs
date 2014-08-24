@@ -67,3 +67,53 @@ n = [(1,2),(3,4)] & mapped . both %~ succ
 -- `.~` sets to a given value.
 o :: [(Integer,Integer)]
 o = [(1,2),(3,4)] & mapped . both .~ 0
+
+---
+
+data User = User { userName :: String
+                 , postsOf :: [Post] } deriving Show
+
+data Post = Post { postOf :: String } deriving Show
+
+posts :: Lens' User [Post]
+posts f (User n p) = fmap (\p' -> User n p') (f p)
+
+title :: Lens' Post String
+title f (Post t) = fmap Post (f t)
+
+users :: [User]
+users = [ User "john" [Post "hello", Post "world"]
+        , User "bob" [Post "foobar"] ]
+
+{- Traversals can be used as Getters, although the Lens UML
+Would have you believe otherwise.
+
+In `Control.Lens.Traversal`, we have:
+
+While a Traversal isn't quite a Fold, it _can_ be used for Getting
+like a Fold, because given a Monoid m, we have an Applicative for (Const m).
+-} 
+goDeep :: Traversal' [User] String
+goDeep = traverse . posts . traverse . title
+
+-- Getting a list of the contents of all posts.
+lensGet :: [String]
+lensGet = users ^.. goDeep
+
+-- Can only "get" this way.
+manualGet :: [String]
+manualGet = concat $ map (map postOf . postsOf) users
+
+-- This is possible because the Applicative instance for Const demands
+-- a Monoid.
+together :: String
+together = users ^. goDeep
+
+lensSet :: String -> [User]
+lensSet b = users & goDeep .~ b
+
+-- _Very_ manual.
+manualSet :: String -> [User]
+manualSet b = map f users
+    where f (User n ps) = User n $ map g ps
+          g (Post _)    = Post b
