@@ -86,7 +86,7 @@ users = [ User "john" [Post "hello", Post "world"]
         , User "bob" [Post "foobar"] ]
 
 {- Traversals can be used as Getters, although the Lens UML
-Would have you believe otherwise.
+would have you believe otherwise.
 
 In `Control.Lens.Traversal`, we have:
 
