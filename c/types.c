@@ -12,8 +12,8 @@ int main(int argc, char *argv[]) {
         printf("%d %ld %f %f %c %s\n", egral, john, ing, team, mander, izard);
 
         // Arrays
-        int   nums[]    = {1,2,3,4,5};
-        char  string2[] = { 'C','o','l','i','n', '\0' };  // Manual nulling?
+        int  nums[]    = {1,2,3,4,5};
+        char string2[] = { 'C','o','l','i','n', '\0' };  // Manual nulling?
         //char* string3   = "This is possible too.";
 
         // Data type sizes. `int` seems to be 32.
@@ -32,15 +32,6 @@ int main(int argc, char *argv[]) {
 
         // This is an array of C-Strings.
         //char* foos[] = {"bar1", "bar2", "bar3"};
-
-        int i;
-
-        printf("argc = %d\n", argc);
-
-        // Playing with CL args.
-        for(i = 0; i < argc; i++) {
-                printf("%02d: %s\n", i, argv[i]);
-        }
 
         return 0;
 }
