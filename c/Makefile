@@ -1,6 +1,6 @@
 CFLAGS=-Wall -g
 
-all: printing types control functions structs
+all: printing types control functions structs db
 
 clean:
 	rm -f printing
@@ -8,3 +8,4 @@ clean:
 	rm -f control
 	rm -f functions
 	rm -f structs
+	rm -f db
