@@ -1,11 +1,9 @@
-CFLAGS=-Wall -g
+CFLAGS=-Wall -g -fdiagnostics-color
 
-all: printing types control functions structs db
+all: rogue
+
+rogue: object.o
 
 clean:
-	rm -f printing
-	rm -f types
-	rm -f control
-	rm -f functions
-	rm -f structs
-	rm -f db
+	rm -f rogue
+	rm -f object.o
