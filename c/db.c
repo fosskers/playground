@@ -9,29 +9,29 @@
 
 // --- //
 
-typedef struct ADDRESS {
+typedef struct {
         int id;
         int set;
         char name[MAX_DATA];
         char email[MAX_DATA];
 } Address;
 
-typedef struct DATABASE {
+typedef struct {
         Address rows[MAX_ROWS];
 } Database;
 
-typedef struct CONNECTION {
+typedef struct {
         FILE* file;
         Database* db;
 } Connection;
 
 // --- //
 
- void Database_close(Connection* c);
+void Database_close(Connection* c);
 
- // --- //
+// --- //
 
- void die(Connection* c, const char* message) {
+void die(Connection* c, const char* message) {
          if(errno) {
                  perror(message);
          } else {
@@ -41,113 +41,113 @@ typedef struct CONNECTION {
          if(c) { Database_close(c); }
 
          exit(1);
- }
+}
 
- void Address_print(const Address* addr) {
-         printf("Address { id=%d, name=%s, email=%s }\n",
-                addr->id, addr->name, addr->email);
- }
+void Address_print(const Address* addr) {
+        printf("Address { id=%d, name=%s, email=%s }\n",
+               addr->id, addr->name, addr->email);
+}
 
- void Database_load(Connection *c) {
-         int rc = fread(c->db, sizeof(Database), 1, c->file);
+void Database_load(Connection *c) {
+        int rc = fread(c->db, sizeof(Database), 1, c->file);
 
-         if(rc != 1) { die(c, "Failed to load database"); }
- }
+        if(rc != 1) { die(c, "Failed to load database"); }
+}
 
- Connection* Database_open(const char* filename, char mode) {
-         Connection* c = malloc(sizeof(Connection));
-         if(!c) { die(c, "Memory error"); }
+Connection* Database_open(const char* filename, char mode) {
+        Connection* c = malloc(sizeof(Connection));
+        if(!c) { die(c, "Memory error"); }
 
-         c->db = malloc(sizeof(Database));
-         if(!c->db) { die(c, "Memory error"); }
+        c->db = malloc(sizeof(Database));
+        if(!c->db) { die(c, "Memory error"); }
 
-         if(mode == 'c') {
-                 c->file = fopen(filename, "w");
-         } else {
-                 c->file = fopen(filename, "r+");
+        if(mode == 'c') {
+                c->file = fopen(filename, "w");
+        } else {
+                c->file = fopen(filename, "r+");
 
-                 if(c->file) { Database_load(c); }
-         }
+                if(c->file) { Database_load(c); }
+        }
 
-         if(!c->file) { die(c, "Failed to open DB file"); }
+        if(!c->file) { die(c, "Failed to open DB file"); }
 
-         return c;
- }
+        return c;
+}
 
- void Database_close(Connection* c) {
-         if(c) {
-                 if(c->file) { fclose(c->file); }
-                 if(c->db) { free(c->db); }
-                 free(c);
-         }
- }
+void Database_close(Connection* c) {
+        if(c) {
+                if(c->file) { fclose(c->file); }
+                if(c->db) { free(c->db); }
+                free(c);
+        }
+}
 
- void Database_write(Connection* c) {
-         rewind(c->file);
+void Database_write(Connection* c) {
+        rewind(c->file);
 
-         int rc = fwrite(c->db, sizeof(Database), 1, c->file);
+        int rc = fwrite(c->db, sizeof(Database), 1, c->file);
 
-         if(rc != 1) { die(c, "Failed to write to database"); }
+        if(rc != 1) { die(c, "Failed to write to database"); }
 
-         rc = fflush(c->file);
-         if(rc == -1) { die(c, "Cannot flush database"); }
- }
+        rc = fflush(c->file);
+        if(rc == -1) { die(c, "Cannot flush database"); }
+}
 
- void Database_create(Connection* c) {
-         int i;
+void Database_create(Connection* c) {
+        int i;
 
-         for(i = 0; i < MAX_ROWS; i++) {
-                 Address addr = {.id = i, .set = 0};
+        for(i = 0; i < MAX_ROWS; i++) {
+                Address addr = {.id = i, .set = 0};
 
-                 c->db->rows[i] = addr;
-         }
- }
+                c->db->rows[i] = addr;
+        }
+}
 
- void Database_set(Connection* c, int id, const char* name, const char* email) {
-         Address* addr = &(c->db->rows[id]);
-         if(addr->set) { die(c,"Entry is already set"); }
+void Database_set(Connection* c, int id, const char* name, const char* email) {
+        Address* addr = &(c->db->rows[id]);
+        if(addr->set) { die(c,"Entry is already set"); }
 
-         addr->set = 1;
-         char* res = strncpy(addr->name, name, MAX_DATA);
-         if(!res) { die(c,"Name copy failed"); }
+        addr->set = 1;
+        char* res = strncpy(addr->name, name, MAX_DATA);
+        if(!res) { die(c,"Name copy failed"); }
 
-         res = strncpy(addr->email, email, MAX_DATA);
-         if(!res) { die(c,"Email copy failed"); }
- }
+        res = strncpy(addr->email, email, MAX_DATA);
+        if(!res) { die(c,"Email copy failed"); }
+}
 
- void Database_get(Connection* c, int id) {
-         Address* addr = &(c->db->rows[id]);
+void Database_get(Connection* c, int id) {
+        Address* addr = &(c->db->rows[id]);
 
-         if(addr->set) {
-                 Address_print(addr);
-         } else {
-                 die(c,"Attempted `get` on unset entry");
-         }
- }
+        if(addr->set) {
+                Address_print(addr);
+        } else {
+                die(c,"Attempted `get` on unset entry");
+        }
+}
 
- void Database_unset(Connection* c, int id) {
-         Address addr = {.id = id, .set = 0};
-         c->db->rows[id] = addr;
- }
+void Database_unset(Connection* c, int id) {
+        Address addr = {.id = id, .set = 0};
+        c->db->rows[id] = addr;
+}
 
- void Database_list(Connection* c) {
-         int i;
-         Database* db = c->db;
+void Database_list(Connection* c) {
+        int i;
+        Database* db = c->db;
 
-         for(i = 0; i < MAX_ROWS; i++) {
-                 Address *curr = &(db->rows[i]);
+        for(i = 0; i < MAX_ROWS; i++) {
+                Address *curr = &(db->rows[i]);
 
-                 if(curr->set) { Address_print(curr); }
-         }
- }
+                if(curr->set) { Address_print(curr); }
+        }
+}
 
- void Database_find(Connection* c, const char* name) {
-         int i;
+void Database_find(Connection* c, const char* name) {
+        int i;
 
-         for(i = 0; i < MAX_ROWS; i++) {
-                 Address *curr = &(c->db->rows[i]);
+        for(i = 0; i < MAX_ROWS; i++) {
+                Address *curr = &(c->db->rows[i]);
 
-                 if(strcmp(curr->name, name) == 0) { Address_print(curr); }
+                if(strcmp(curr->name, name) == 0) { Address_print(curr); }
         }
 }
 
