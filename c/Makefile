@@ -1,9 +1,10 @@
-CFLAGS=-Wall -g -fdiagnostics-color
+CFLAGS=-Wall -g -fdiagnostics-color -DNDEBUG
 
-all: rogue
+all: rogue testdbg
 
 rogue: object.o
 
 clean:
 	rm -f rogue
 	rm -f object.o
+	rm -f testdbg
