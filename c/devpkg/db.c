@@ -14,6 +14,7 @@ static void DB_close(FILE* db) {
         fclose(db);
 }
 
+/* Yields the contents of the DB file as a `bstring`. */
 static bstring DB_load() {
         FILE* db = NULL;
         bstring data = NULL;
@@ -33,6 +34,7 @@ static bstring DB_load() {
         return NULL;
 }
 
+/* Attempts to add a new line to the DB. */
 int DB_update(const char* url) {
         if(DB_find(url)) {
                 log_info("Already installed: %s", url);
@@ -53,6 +55,7 @@ int DB_update(const char* url) {
         return -1;
 }
 
+/* Searches for a URL somewhere in the database data. */
 bool DB_find(const char* url) {
         bstring data = NULL;
         bstring line = bfromcstr(url);
@@ -61,6 +64,7 @@ bool DB_find(const char* url) {
         data = DB_load();
         check(data, "Failed to load: %s", DB_FILE);
 
+        // Is this efficient?
         if(binstr(data, 0, line) != BSTR_ERR) {
                 res = true;
         }
@@ -74,7 +78,7 @@ bool DB_find(const char* url) {
 
 int DB_init() {
         apr_pool_t* p = NULL;
-        apr_pool_initialize();
+        apr_initialize();
         apr_pool_create(&p, NULL);
 
         if(access(DB_DIR, W_OK | X_OK) == -1){
@@ -90,10 +94,12 @@ int DB_init() {
                 DB_close(db);
         }
 
+        apr_terminate();
         apr_pool_destroy(p);
         return 0;
 
  error:
+        apr_terminate();
         apr_pool_destroy(p);
         return -1;
 }

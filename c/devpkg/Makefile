@@ -1,7 +1,7 @@
 TARGET=devpkg
 WARNINGS=-Wall -Wshadow -Wunreachable-code
 CFLAGS=$(WARNINGS) -g -O -rdynamic -fdiagnostics-color -I/usr/include/apr-1
-LDFLAGS=-lbstrlib -lapr-1
+LDFLAGS=-lbstrlib -lapr-1 -pthread -laprutil-1
 HEADERS=dbg.h db.h
 OBJECTS=db.o shell.o commands.o devpkg.o
 
@@ -20,5 +20,5 @@ clean:
 
 # Compile Check
 cc:
-	make all
 	make clean
+	make all
