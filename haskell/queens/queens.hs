@@ -13,6 +13,7 @@ diagsClear board = f $ map (\x -> (x, index x board)) board
     where f []     = True
           f (x:xs) = (and $ map (\y -> not $ areDiag x y) xs) && f xs
 
+index :: Eq a => a -> [a] -> Int
 index a xs = f xs 0
     where f (y:ys) n | a == y    = n
                      | otherwise = f ys (n+1)
