@@ -14,3 +14,15 @@ where maker not in (
       -- Makers of printers.
       select distinct maker from printer
 );
+
+---
+
+create trigger AvgLappy
+after update of price on laptop
+referencing old table as OT
+            new table as NT
+for each statement
+when (1500 >= (select avg(price) from laptop))
+begin
+    delete from laptop where (... in NT)
+    insert into laptop (select * from OT)
