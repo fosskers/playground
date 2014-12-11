@@ -1,20 +1,28 @@
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TupleSections #-}
+{-# LANGUAGE OverloadedLists #-}
 
 -- Blog post explaining how Lenses are derived:
 -- http://blog.jakubarnold.cz/2014/07/14/lens-tutorial-introduction-part-1.html
 
-import Control.Lens
-import Data.Text.Lens
-import Data.Monoid
-import Data.Functor.Identity
-import Control.Applicative ((<$>),(<*>))
+import           Control.Applicative ((<$>),(<*>))
+import           Control.Lens
+import           Data.Functor.Identity
+import           Data.HashMap.Lazy hiding (map)
+import           Data.Monoid
+import           Data.Text (Text)
+import qualified Data.Text as T
+import           Data.Text.Lens
 
 ---
 
-f :: [[(String,String)]] -> Sum Int
-f s = s ^. traverse . traverse . _1 . to (Sum . length)
+f :: [[(Text,Text)]] -> Sum Int
+f s = s ^. traverse . traverse . _1 . to (Sum . T.length)
 
+s1 :: [[(Text,Text)]]
 s1 = [[("this","is good")]]
+
+s2 :: [[(Text,Text)]]
 s2 = [[("this","is good"),("this","is also good")]]
 
 -- Works with any tuple.
@@ -61,8 +69,8 @@ m :: Lens' (a,b) b
 m f (a,b) = fmap (a,) $ f b
 
 -- `%~` takes a pure transformation and sets with that.
-n :: [(Integer,Integer)]
-n = [(1,2),(3,4)] & mapped . both %~ succ
+n :: HashMap Int (Int,Int,Int) --[(Integer,Integer)]
+n = [(0,(1,2,3)),(1,(3,4,5))] & mapped . each %~ succ
 
 -- `.~` sets to a given value.
 o :: [(Integer,Integer)]
@@ -70,15 +78,15 @@ o = [(1,2),(3,4)] & mapped . both .~ 0
 
 ---
 
-data User = User { userName :: String
+data User = User { userName :: Text
                  , postsOf :: [Post] } deriving Show
 
-data Post = Post { postOf :: String } deriving Show
+data Post = Post { postOf :: Text } deriving Show
 
 posts :: Lens' User [Post]
 posts f (User n p) = fmap (\p' -> User n p') (f p)
 
-title :: Lens' Post String
+title :: Lens' Post Text
 title f (Post t) = fmap Post (f t)
 
 users :: [User]
@@ -93,27 +101,27 @@ In `Control.Lens.Traversal`, we have:
 While a Traversal isn't quite a Fold, it _can_ be used for Getting
 like a Fold, because given a Monoid m, we have an Applicative for (Const m).
 -} 
-goDeep :: Traversal' [User] String
+goDeep :: Traversal' [User] Text
 goDeep = traverse . posts . traverse . title
 
 -- Getting a list of the contents of all posts.
-lensGet :: [String]
+lensGet :: [Text]
 lensGet = users ^.. goDeep
 
 -- Can only "get" this way.
-manualGet :: [String]
+manualGet :: [Text]
 manualGet = concat $ map (map postOf . postsOf) users
 
 -- This is possible because the Applicative instance for Const demands
 -- a Monoid.
-together :: String
+together :: Text
 together = users ^. goDeep
 
-lensSet :: String -> [User]
+lensSet :: Text -> [User]
 lensSet b = users & goDeep .~ b
 
 -- _Very_ manual.
-manualSet :: String -> [User]
+manualSet :: Text -> [User]
 manualSet b = map f users
     where f (User n ps) = User n $ map g ps
           g (Post _)    = Post b
