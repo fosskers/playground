@@ -37,9 +37,10 @@ flags = Flags
                              <> help "The side dish you want")
         -- A Boolean flag.
         <*> switch (long "time" <> help "Tell the time")
+        -- An option that takes Haskell data as an arg.
+        <*> optional maybeP
         -- Non-option arguments. File lists, package names, etc.
         -- Anything after a `--` will be considered an argument.
-        <*> optional maybeP
         <*> many (argument str $ metavar "EXTRAS...")
 
 -- Handle all the options.
