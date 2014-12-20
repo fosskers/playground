@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="app_name">Androidlehrung</string>
+  <string name="edit_message">Bitte etwas.</string>
+  <string name="button_send">Senden</string>
+  <string name="title_activity_display_message">Mein Text</string>
+  <string name="action_search">Suchen</string>
+  <string name="action_settings">Einstellungen</string>
+  <string name="notify">Buzz</string>
+  <string name="notify_title">Bestes Notifikation</string>
+  <string name="notify_content">Ich liebe Notifikationen!</string>
+</resources>

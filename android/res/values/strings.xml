@@ -7,4 +7,6 @@
   <string name="action_search">Search</string>
   <string name="action_settings">Settings</string>
   <string name="notify">Notify</string>
+  <string name="notify_title">Best Notification</string>
+  <string name="notify_content">Warning: You have been notified!</string>
 </resources>

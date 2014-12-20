@@ -63,9 +63,9 @@ public class AndroidLearning extends Activity
         NotificationCompat.Builder b = new NotificationCompat.Builder(this);
         b.setSmallIcon(R.drawable.icon_search);
         b.setAutoCancel(true);
-        b.setContentTitle("Best Notification");
-        b.setContentText("Warning: You have been notified!");
-        b.setSubText("This is subtext.");
+        b.setContentTitle(getResources().getString(R.string.notify_title));
+        b.setContentText(getResources().getString(R.string.notify_content));
+        //        b.setSubText("This is subtext.");
 
         NotificationManager nm =
             (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
