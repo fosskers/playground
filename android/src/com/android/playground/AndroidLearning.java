@@ -1,19 +1,22 @@
 package com.android.playground;
 
 import android.app.Activity;
+import android.app.NotificationManager;
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.EditText;
-import android.view.View;
+import android.support.v4.app.NotificationCompat;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.EditText;
 
 // --- //
 
 public class AndroidLearning extends Activity
 {
     public final static String EXTRA_MSG = "com.android.playground.MESSAGE";
+    public static final int NOTIFICATION_ID = 1;
 
     /** Called when the activity is first created. */
     @Override
@@ -53,5 +56,19 @@ public class AndroidLearning extends Activity
         default:
             return super.onOptionsItemSelected(i);
         }
+    }
+
+    /* Notify the user */
+    public void notify(View v) {
+        NotificationCompat.Builder b = new NotificationCompat.Builder(this);
+        b.setSmallIcon(R.drawable.icon_search);
+        b.setAutoCancel(true);
+        b.setContentTitle("Best Notification");
+        b.setContentText("Warning: You have been notified!");
+        b.setSubText("This is subtext.");
+
+        NotificationManager nm =
+            (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+        nm.notify(NOTIFICATION_ID, b.build());
     }
 }
