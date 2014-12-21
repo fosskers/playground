@@ -10,6 +10,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Switch;
 
 // --- //
 
@@ -17,6 +18,7 @@ public class AndroidLearning extends Activity
 {
     public final static String EXTRA_MSG = "com.android.playground.MESSAGE";
     public static final int NOTIFICATION_ID = 1;
+    public static boolean service_on = false;
 
     /** Called when the activity is first created. */
     @Override
@@ -58,14 +60,20 @@ public class AndroidLearning extends Activity
         }
     }
 
-    /* Notify the user */
-    public void notify(View v) {
+    /* Turn functionality on/off and notify user */
+    public void switchPress(View v) {
         NotificationCompat.Builder b = new NotificationCompat.Builder(this);
-        b.setSmallIcon(R.drawable.icon_search);
+        b.setSmallIcon(R.drawable.ic_logo);
         b.setAutoCancel(true);
         b.setContentTitle(getResources().getString(R.string.notify_title));
-        b.setContentText(getResources().getString(R.string.notify_content));
-        //        b.setSubText("This is subtext.");
+
+        if(((Switch)v).isChecked()) {
+            b.setContentText(getResources().getString(R.string.notify_on));
+            service_on = true;
+        } else {
+            b.setContentText(getResources().getString(R.string.notify_off));
+            service_on = false;
+        }
 
         NotificationManager nm =
             (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
