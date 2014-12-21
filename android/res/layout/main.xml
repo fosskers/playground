@@ -17,7 +17,4 @@
             android:text="@string/button_send"
             android:onClick="sendMessage"/>
   </LinearLayout>
-    <Switch android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="switchPress"/>
 </LinearLayout>
