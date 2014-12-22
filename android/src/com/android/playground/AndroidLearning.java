@@ -15,7 +15,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Switch;
+import android.widget.TextView;
 import java.util.List;
 
 // --- //
@@ -23,9 +25,9 @@ import java.util.List;
 public class AndroidLearning extends Activity
 {
     public final static String EXTRA_MSG = "com.android.playground.MESSAGE";
-    public static final int NOTIFICATION_ID = 1;
-    public static final int GENERIC_NOTIFICATION = 2;
-    public static boolean service_on = false;
+    private static final int NOTIFICATION_ID = 1;
+    private static final int GENERIC_NOTIFICATION = 2;
+    private static boolean service_on = false;
 
     /** Called when the activity is first created. */
     @Override
@@ -42,9 +44,16 @@ public class AndroidLearning extends Activity
                     List<ScanResult> rs = wm.getScanResults();  // <List>!
 
                     genericNotification("Signals: " + rs.size());
+
+                    LinearLayout ll = (LinearLayout)findViewById(R.id.masterLayout);
+                    for(ScanResult sr : rs) {
+                        TextView t = new TextView(c);
+                        t.setText(sr.SSID + " " + sr.level);
+                        ll.addView(t);
+                    }
                 }
             }, i);
-        
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
     }
