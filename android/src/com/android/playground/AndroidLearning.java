@@ -2,7 +2,12 @@ package com.android.playground;
 
 import android.app.Activity;
 import android.app.NotificationManager;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.wifi.WifiManager;
+import android.net.wifi.ScanResult;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.view.Menu;
@@ -11,6 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Switch;
+import java.util.List;
 
 // --- //
 
@@ -18,12 +24,27 @@ public class AndroidLearning extends Activity
 {
     public final static String EXTRA_MSG = "com.android.playground.MESSAGE";
     public static final int NOTIFICATION_ID = 1;
+    public static final int GENERIC_NOTIFICATION = 2;
     public static boolean service_on = false;
 
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
+        IntentFilter i = new IntentFilter();
+        i.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
+        registerReceiver(new BroadcastReceiver() {
+                public void onReceive(Context c, Intent i) {
+                    // Code to execute when the event occurs!
+                    WifiManager wm = (WifiManager)c
+                        .getSystemService(Context.WIFI_SERVICE);
+                    
+                    List<ScanResult> rs = wm.getScanResults();  // <List>!
+
+                    genericNotification("Signals: " + rs.size());
+                }
+            }, i);
+        
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
     }
@@ -46,20 +67,6 @@ public class AndroidLearning extends Activity
         return super.onCreateOptionsMenu(m);
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem i) {
-        switch(i.getItemId()) {
-        case R.id.action_search:
-            //            openSearch();
-            return true;
-        case R.id.action_settings:
-            //            openSettings();
-            return true;
-        default:
-            return super.onOptionsItemSelected(i);
-        }
-    }
-
     /* Turn functionality on/off and notify user */
     public void switchPress(View v) {
         NotificationCompat.Builder b = new NotificationCompat.Builder(this);
@@ -78,5 +85,35 @@ public class AndroidLearning extends Activity
         NotificationManager nm =
             (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
         nm.notify(NOTIFICATION_ID, b.build());
+    }
+
+    public void refresh(View v) {
+        WifiManager wm;
+
+        if(service_on) {
+            wm = (WifiManager)getSystemService(WIFI_SERVICE);
+            genericNotification(
+                "Wifi on? " + String.valueOf(wm.isWifiEnabled())
+            );
+            wm.startScan();
+        }
+
+        /* Eventually I'll need a WifiLock.
+         * https://developer.android.com/reference/android/net/wifi/WifiManager.WifiLock.html
+         * Use `acquire()` and `release()`.
+         * TODO: Find out about permissions, because this needs one.
+         */
+    }
+
+    private void genericNotification(String msg) {
+        NotificationCompat.Builder b = new NotificationCompat.Builder(this);
+        b.setSmallIcon(R.drawable.ic_logo);
+        b.setAutoCancel(true);
+        b.setContentTitle(getResources().getString(R.string.notify_title));
+        b.setContentText(msg);
+
+        NotificationManager nm =
+            (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+        nm.notify(GENERIC_NOTIFICATION, b.build());
     }
 }
