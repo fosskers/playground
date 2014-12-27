@@ -22,4 +22,24 @@
           android:layout_height="wrap_content"
           android:text="@string/button_refresh"
           android:onClick="refresh"/>
+  <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              android:orientation="horizontal">
+    <RadioButton android:id="@+id/radio_weak"
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:text="@string/radio_weak"
+                 android:onClick="strengthSelected"/>
+    <RadioButton android:id="@+id/radio_medium"
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:text="@string/radio_medium"
+                 android:onClick="strengthSelected"/>
+    <RadioButton android:id="@+id/radio_strong"
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:text="@string/radio_strong"
+                 android:onClick="strengthSelected"/>
+  </RadioGroup>
 </LinearLayout>

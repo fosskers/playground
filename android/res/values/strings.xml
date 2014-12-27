@@ -4,8 +4,11 @@
   <string name="edit_message">Enter a Message</string>
   <string name="button_send">Send</string>
   <string name="title_activity_display_message">My Message</string>
-  <string name="button_refresh">Refresh</string>
+  <string name="button_refresh">Scan</string>
   <string name="notify_title">Android Learning</string>
   <string name="notify_on">Background functionality is On.</string>
   <string name="notify_off">Background functionality is Off.</string>
+  <string name="radio_weak">Weak</string>
+  <string name="radio_medium">Medium</string>
+  <string name="radio_strong">Strong</string>
 </resources>
