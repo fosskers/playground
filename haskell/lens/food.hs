@@ -16,13 +16,10 @@ instance Semigroup Food where
   F c1 f1 s1 p1 <> F c2 f2 s2 p2 = F (c1 + c2) (f1 + f2) (s1 + s2) (p1 + p2)
 
 foodLens :: Traversal' Food Float
-foodLens = fLens . sumLens
+foodLens = fLens . _Wrapping Sum
 
 fLens :: Traversal' Food (Sum Float)
 fLens g (F c f s p) = F <$> g c <*> g f <*> g s <*> g p
-
-sumLens :: Num a => Lens' (Sum a) a
-sumLens f (Sum s) = Sum <$> f s
 
 ---
 
