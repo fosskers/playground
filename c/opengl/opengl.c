@@ -17,6 +17,12 @@ const GLchar* vertexShaderSource = "#version 330 core\n"
         "gl_Position = vec4(position.x, position.y, 0.0, 1.0);\n"
         "}\0";
 
+const GLchar* fragmentShaderSource = "#version 330 core\n"
+        "out vec4 color;\n"
+        "void main() {\n"
+        "color = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+        "}\0";
+
 void key_callback(GLFWwindow* w, int key, int code, int action, int mode) {
         if(key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
                 glfwSetWindowShouldClose(w, GL_TRUE);
@@ -55,17 +61,32 @@ int main(int argc, char** argv) {
         // Register callbacks.
         glfwSetKeyCallback(w, key_callback);
 
+        // Vertex Array
+        GLuint VAO;
+        glGenVertexArrays(1,&VAO);
+
         // Buffer for our data
-        GLuint buff;
-        glGenBuffers(1,&buff);
-        glBindBuffer(GL_ARRAY_BUFFER, buff);
+        GLuint VBO;
+        glBindVertexArray(VAO);  // VAO!
+        glGenBuffers(1,&VBO);
+        glBindBuffer(GL_ARRAY_BUFFER, VBO);
         glBufferData(GL_ARRAY_BUFFER,sizeof(verts),verts,GL_STATIC_DRAW);
+
+        // Tell OpenGL how to process Vertex data.
+        glVertexAttribPointer(0,2,GL_FLOAT,GL_FALSE,0,(GLvoid*)0);
+        glEnableVertexAttribArray(0);
+        glBindVertexArray(0);  // Reset the VAO binding.
 
         // Compile Shaders and check success
         GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
         glShaderSource(vertexShader,1,&vertexShaderSource,NULL);
         glCompileShader(vertexShader);
 
+        GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+        glShaderSource(fragmentShader,1,&fragmentShaderSource,NULL);
+        glCompileShader(fragmentShader);
+
+        /*
         GLint success;
         GLchar infoLog[512];
         glGetShaderiv(vertexShader,GL_COMPILE_STATUS,&success);
@@ -74,6 +95,17 @@ int main(int argc, char** argv) {
                 glGetShaderInfoLog(vertexShader,512,NULL,infoLog);
                 printf("Vertex Shader failed to compile:\n%s\n", infoLog);
         }
+        */
+
+        // Shader Program - linking shaders
+        GLuint shaderProgram = glCreateProgram();
+        glAttachShader(shaderProgram,vertexShader);
+        glAttachShader(shaderProgram,fragmentShader);
+        glLinkProgram(shaderProgram);
+
+        // No longer needed.
+        glDeleteShader(vertexShader);
+        glDeleteShader(fragmentShader);
         
         // Render until you shouldn't.
         while(!glfwWindowShouldClose(w)) {
@@ -81,6 +113,12 @@ int main(int argc, char** argv) {
 
                 glClearColor(0.2f,0.3f,0.3f,1.0f);
                 glClear(GL_COLOR_BUFFER_BIT);
+
+                // Draw object
+                glUseProgram(shaderProgram);
+                glBindVertexArray(VAO);
+                glDrawArrays(GL_TRIANGLES,0,3);
+                glBindVertexArray(0);
 
                 // Always comes last.
                 glfwSwapBuffers(w);
