@@ -23,6 +23,12 @@ const GLchar* fragmentShaderSource = "#version 330 core\n"
         "color = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
         "}\0";
 
+const GLchar* fragmentShader2Source = "#version 330 core\n"
+        "out vec4 color;\n"
+        "void main() {\n"
+        "color = vec4(1.0f, 1.0f, 0.2f, 1.0f);\n"
+        "}\0";
+
 void key_callback(GLFWwindow* w, int key, int code, int action, int mode) {
         if(key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
                 glfwSetWindowShouldClose(w, GL_TRUE);
@@ -34,10 +40,31 @@ int main(int argc, char** argv) {
          * These are always from -1 to 1, form a Cartesian plane,
          * and are translated to screen coordinates later.
          */
+        /*
         GLfloat verts[] = {
+                0.5f,0.5f,    // TR
+                0.5f,-0.5f,   // BR
+                -0.5f,-0.5f,  // BL
+                -0.5f,0.5f    // TL
+        };
+        */
+
+        GLfloat tri1[] = {
+                -0.5f,0.5f,
                 -0.5f,-0.5f,
-                0.5f,-0.5,
-                0,0.5
+                0,-0.5f
+        };
+
+        GLfloat tri2[] = {
+                0,0.5f,
+                0.5f,0.5f,
+                0.5f,-0.5f
+        };
+
+        // For an EBO
+        GLuint ixs[] = {
+                0,1,3,  // First triangle
+                1,2,3   // Second triangle
         };
         
         // Initial settings.
@@ -61,30 +88,55 @@ int main(int argc, char** argv) {
         // Register callbacks.
         glfwSetKeyCallback(w, key_callback);
 
-        // Vertex Array
-        GLuint VAO;
-        glGenVertexArrays(1,&VAO);
+        // Element Buffer
+        //GLuint EBO;
+        //glGenBuffers(1,&EBO);
 
-        // Buffer for our data
-        GLuint VBO;
-        glBindVertexArray(VAO);  // VAO!
-        glGenBuffers(1,&VBO);
-        glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        glBufferData(GL_ARRAY_BUFFER,sizeof(verts),verts,GL_STATIC_DRAW);
+        // Vertex Array 1
+        GLuint VAO1;
+        glGenVertexArrays(1,&VAO1);
+
+        // Vertex buffer for our data
+        GLuint VBO1;
+        glBindVertexArray(VAO1);  // VAO!
+        glGenBuffers(1,&VBO1);
+        glBindBuffer(GL_ARRAY_BUFFER, VBO1);
+        glBufferData(GL_ARRAY_BUFFER,sizeof(tri1),tri1,GL_STATIC_DRAW);
+
+        // Bound EBO is stored in VAO.
+        //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,EBO);
+        //glBufferData(GL_ELEMENT_ARRAY_BUFFER,sizeof(ixs),ixs,GL_STATIC_DRAW);
 
         // Tell OpenGL how to process Vertex data.
         glVertexAttribPointer(0,2,GL_FLOAT,GL_FALSE,0,(GLvoid*)0);
         glEnableVertexAttribArray(0);
         glBindVertexArray(0);  // Reset the VAO binding.
 
+        // Stack for the second Triangle
+        GLuint VAO2;
+        glGenVertexArrays(1,&VAO2);
+
+        GLuint VBO2;
+        glBindVertexArray(VAO2);  // VAO!
+        glGenBuffers(1,&VBO2);
+        glBindBuffer(GL_ARRAY_BUFFER, VBO2);
+        glBufferData(GL_ARRAY_BUFFER,sizeof(tri2),tri2,GL_STATIC_DRAW);
+        glVertexAttribPointer(0,2,GL_FLOAT,GL_FALSE,0,(GLvoid*)0);
+        glEnableVertexAttribArray(0);
+        glBindVertexArray(0);  // Reset the VAO binding.
+        
         // Compile Shaders and check success
         GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
         glShaderSource(vertexShader,1,&vertexShaderSource,NULL);
         glCompileShader(vertexShader);
 
-        GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-        glShaderSource(fragmentShader,1,&fragmentShaderSource,NULL);
-        glCompileShader(fragmentShader);
+        GLuint fragmentShader1 = glCreateShader(GL_FRAGMENT_SHADER);
+        glShaderSource(fragmentShader1,1,&fragmentShaderSource,NULL);
+        glCompileShader(fragmentShader1);
+
+        GLuint fragmentShader2 = glCreateShader(GL_FRAGMENT_SHADER);
+        glShaderSource(fragmentShader2,1,&fragmentShader2Source,NULL);
+        glCompileShader(fragmentShader2);
 
         /*
         GLint success;
@@ -97,15 +149,24 @@ int main(int argc, char** argv) {
         }
         */
 
-        // Shader Program - linking shaders
-        GLuint shaderProgram = glCreateProgram();
-        glAttachShader(shaderProgram,vertexShader);
-        glAttachShader(shaderProgram,fragmentShader);
-        glLinkProgram(shaderProgram);
+        // Shader Programs - linking shaders
+        GLuint shaderProgram1 = glCreateProgram();
+        glAttachShader(shaderProgram1,vertexShader);
+        glAttachShader(shaderProgram1,fragmentShader1);
+        glLinkProgram(shaderProgram1);
+
+        GLuint shaderProgram2 = glCreateProgram();
+        glAttachShader(shaderProgram2,vertexShader);
+        glAttachShader(shaderProgram2,fragmentShader2);
+        glLinkProgram(shaderProgram2);
 
         // No longer needed.
         glDeleteShader(vertexShader);
-        glDeleteShader(fragmentShader);
+        glDeleteShader(fragmentShader1);
+        glDeleteShader(fragmentShader2);
+        
+        // Draw in Wireframe mode
+        //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         
         // Render until you shouldn't.
         while(!glfwWindowShouldClose(w)) {
@@ -115,8 +176,14 @@ int main(int argc, char** argv) {
                 glClear(GL_COLOR_BUFFER_BIT);
 
                 // Draw object
-                glUseProgram(shaderProgram);
-                glBindVertexArray(VAO);
+                glUseProgram(shaderProgram1);
+                glBindVertexArray(VAO1);
+                glDrawArrays(GL_TRIANGLES,0,3);
+                //glDrawElements(GL_TRIANGLES,6,GL_UNSIGNED_INT,0);
+                glBindVertexArray(0);
+
+                glUseProgram(shaderProgram2);
+                glBindVertexArray(VAO2);
                 glDrawArrays(GL_TRIANGLES,0,3);
                 glBindVertexArray(0);
 
