@@ -1,7 +1,7 @@
 TARGET=opengl
 WARNINGS=-Wall -Wshadow -Wunreachable-code
 CFLAGS=$(WARNINGS) -g -O -fdiagnostics-color -DNDEBUG
-LDFLAGS=-lGL -lglfw -lGLEW -lpthread
+LDFLAGS=-lGL -lglfw -lGLEW -lpthread -lm
 HEADERS=
 OBJECTS=opengl.o
 

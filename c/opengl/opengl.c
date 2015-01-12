@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <GL/glew.h>  // This must be before other GL libs.
 #include <GLFW/glfw3.h>
+#include <math.h>
 
 /* NOTES
  * We should use `GL` prefixed types, as OpenGL sets these up in
@@ -13,20 +14,17 @@
 // Shaders. Looks like C code.
 const GLchar* vertexShaderSource = "#version 330 core\n"
         "layout (location = 0) in vec2 position;\n"
+        "out vec4 vertexColor;\n"
         "void main() {\n"
         "gl_Position = vec4(position.x, position.y, 0.0, 1.0);\n"
+        "vertexColor = vec4(0.5f, 0.0f, 0.0f, 1.0f);\n"
         "}\0";
 
 const GLchar* fragmentShaderSource = "#version 330 core\n"
         "out vec4 color;\n"
+        "uniform vec4 ourColour;\n"
         "void main() {\n"
-        "color = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-        "}\0";
-
-const GLchar* fragmentShader2Source = "#version 330 core\n"
-        "out vec4 color;\n"
-        "void main() {\n"
-        "color = vec4(1.0f, 1.0f, 0.2f, 1.0f);\n"
+        "color = ourColour;\n"
         "}\0";
 
 void key_callback(GLFWwindow* w, int key, int code, int action, int mode) {
@@ -124,19 +122,15 @@ int main(int argc, char** argv) {
         glVertexAttribPointer(0,2,GL_FLOAT,GL_FALSE,0,(GLvoid*)0);
         glEnableVertexAttribArray(0);
         glBindVertexArray(0);  // Reset the VAO binding.
-        
+                
         // Compile Shaders and check success
         GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
         glShaderSource(vertexShader,1,&vertexShaderSource,NULL);
         glCompileShader(vertexShader);
 
-        GLuint fragmentShader1 = glCreateShader(GL_FRAGMENT_SHADER);
-        glShaderSource(fragmentShader1,1,&fragmentShaderSource,NULL);
-        glCompileShader(fragmentShader1);
-
-        GLuint fragmentShader2 = glCreateShader(GL_FRAGMENT_SHADER);
-        glShaderSource(fragmentShader2,1,&fragmentShader2Source,NULL);
-        glCompileShader(fragmentShader2);
+        GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+        glShaderSource(fragmentShader,1,&fragmentShaderSource,NULL);
+        glCompileShader(fragmentShader);
 
         /*
         GLint success;
@@ -150,20 +144,14 @@ int main(int argc, char** argv) {
         */
 
         // Shader Programs - linking shaders
-        GLuint shaderProgram1 = glCreateProgram();
-        glAttachShader(shaderProgram1,vertexShader);
-        glAttachShader(shaderProgram1,fragmentShader1);
-        glLinkProgram(shaderProgram1);
-
-        GLuint shaderProgram2 = glCreateProgram();
-        glAttachShader(shaderProgram2,vertexShader);
-        glAttachShader(shaderProgram2,fragmentShader2);
-        glLinkProgram(shaderProgram2);
+        GLuint shaderProgram = glCreateProgram();
+        glAttachShader(shaderProgram,vertexShader);
+        glAttachShader(shaderProgram,fragmentShader);
+        glLinkProgram(shaderProgram);
 
         // No longer needed.
         glDeleteShader(vertexShader);
-        glDeleteShader(fragmentShader1);
-        glDeleteShader(fragmentShader2);
+        glDeleteShader(fragmentShader);
         
         // Draw in Wireframe mode
         //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -175,14 +163,21 @@ int main(int argc, char** argv) {
                 glClearColor(0.2f,0.3f,0.3f,1.0f);
                 glClear(GL_COLOR_BUFFER_BIT);
 
+                glUseProgram(shaderProgram);
+
+                // Setting fragment shader colour over time.
+                GLfloat timeValue = glfwGetTime();
+                GLfloat greenValue = (sin(timeValue) / 2) + 0.5;
+                GLint vColourLoc = glGetUniformLocation(shaderProgram,"ourColour");
+
                 // Draw object
-                glUseProgram(shaderProgram1);
+                glUniform4f(vColourLoc,0.0f,greenValue,0.0f,1.0f);
+
                 glBindVertexArray(VAO1);
                 glDrawArrays(GL_TRIANGLES,0,3);
                 //glDrawElements(GL_TRIANGLES,6,GL_UNSIGNED_INT,0);
                 glBindVertexArray(0);
 
-                glUseProgram(shaderProgram2);
                 glBindVertexArray(VAO2);
                 glDrawArrays(GL_TRIANGLES,0,3);
                 glBindVertexArray(0);
