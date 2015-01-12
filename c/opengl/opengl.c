@@ -14,17 +14,18 @@
 // Shaders. Looks like C code.
 const GLchar* vertexShaderSource = "#version 330 core\n"
         "layout (location = 0) in vec2 position;\n"
-        "out vec4 vertexColor;\n"
+        "layout (location = 1) in vec3 colour;\n"
+        "out vec3 vertexColour;\n"
         "void main() {\n"
         "gl_Position = vec4(position.x, position.y, 0.0, 1.0);\n"
-        "vertexColor = vec4(0.5f, 0.0f, 0.0f, 1.0f);\n"
+        "vertexColour = colour;\n"
         "}\0";
 
 const GLchar* fragmentShaderSource = "#version 330 core\n"
+        "in vec3 vertexColour;\n"
         "out vec4 color;\n"
-        "uniform vec4 ourColour;\n"
         "void main() {\n"
-        "color = ourColour;\n"
+        "color = vec4(vertexColour,1.0f);\n"
         "}\0";
 
 void key_callback(GLFWwindow* w, int key, int code, int action, int mode) {
@@ -38,15 +39,13 @@ int main(int argc, char** argv) {
          * These are always from -1 to 1, form a Cartesian plane,
          * and are translated to screen coordinates later.
          */
-        /*
         GLfloat verts[] = {
-                0.5f,0.5f,    // TR
-                0.5f,-0.5f,   // BR
-                -0.5f,-0.5f,  // BL
-                -0.5f,0.5f    // TL
+                0.5f,-0.5f,  1.0f,0.0f,0.0f,  // BR
+                -0.5f,-0.5f, 0.0f,1.0f,0.0f,  // BL
+                0.0f,0.5f,   0.0f,0.0f,1.0f   // Top
         };
-        */
 
+        /*
         GLfloat tri1[] = {
                 -0.5f,0.5f,
                 -0.5f,-0.5f,
@@ -64,6 +63,7 @@ int main(int argc, char** argv) {
                 0,1,3,  // First triangle
                 1,2,3   // Second triangle
         };
+        */
         
         // Initial settings.
         glfwInit();
@@ -99,17 +99,22 @@ int main(int argc, char** argv) {
         glBindVertexArray(VAO1);  // VAO!
         glGenBuffers(1,&VBO1);
         glBindBuffer(GL_ARRAY_BUFFER, VBO1);
-        glBufferData(GL_ARRAY_BUFFER,sizeof(tri1),tri1,GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER,sizeof(verts),verts,GL_STATIC_DRAW);
 
         // Bound EBO is stored in VAO.
         //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,EBO);
         //glBufferData(GL_ELEMENT_ARRAY_BUFFER,sizeof(ixs),ixs,GL_STATIC_DRAW);
 
         // Tell OpenGL how to process Vertex data.
-        glVertexAttribPointer(0,2,GL_FLOAT,GL_FALSE,0,(GLvoid*)0);
+        glVertexAttribPointer(0,2,GL_FLOAT,GL_FALSE,
+                              5 * sizeof(GLfloat),(GLvoid*)0);
         glEnableVertexAttribArray(0);
+        glVertexAttribPointer(1,3,GL_FLOAT,GL_FALSE,
+                              5 * sizeof(GLfloat),(GLvoid*)(2 * sizeof(GLfloat)));
+        glEnableVertexAttribArray(1);
         glBindVertexArray(0);  // Reset the VAO binding.
 
+        /*
         // Stack for the second Triangle
         GLuint VAO2;
         glGenVertexArrays(1,&VAO2);
@@ -122,6 +127,7 @@ int main(int argc, char** argv) {
         glVertexAttribPointer(0,2,GL_FLOAT,GL_FALSE,0,(GLvoid*)0);
         glEnableVertexAttribArray(0);
         glBindVertexArray(0);  // Reset the VAO binding.
+        */
                 
         // Compile Shaders and check success
         GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -178,9 +184,11 @@ int main(int argc, char** argv) {
                 //glDrawElements(GL_TRIANGLES,6,GL_UNSIGNED_INT,0);
                 glBindVertexArray(0);
 
+                /*
                 glBindVertexArray(VAO2);
                 glDrawArrays(GL_TRIANGLES,0,3);
                 glBindVertexArray(0);
+                */
 
                 // Always comes last.
                 glfwSwapBuffers(w);
