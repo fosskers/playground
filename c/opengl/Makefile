@@ -1,9 +1,9 @@
 TARGET=opengl
 WARNINGS=-Wall -Wshadow -Wunreachable-code
-CFLAGS=$(WARNINGS) -g -O -fdiagnostics-color -DNDEBUG
+CFLAGS=$(WARNINGS) -g -O -fdiagnostics-color
 LDFLAGS=-lGL -lglfw -lGLEW -lpthread -lm
-HEADERS=
-OBJECTS=opengl.o
+HEADERS=ogls/opengl-shader.h ogls/dbg.h ogls/colour.h
+OBJECTS=ogls/opengl-shaders.o opengl.o
 
 default: $(TARGET)
 all: default

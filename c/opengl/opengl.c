@@ -4,29 +4,15 @@
 #include <GLFW/glfw3.h>
 #include <math.h>
 
+#include "ogls/opengl-shaders.h"
+#include "ogls/dbg.h"
+
 /* NOTES
  * We should use `GL` prefixed types, as OpenGL sets these up in
  * a cross-platform manner.
  */
 
 // --- //
-
-// Shaders. Looks like C code.
-const GLchar* vertexShaderSource = "#version 330 core\n"
-        "layout (location = 0) in vec2 position;\n"
-        "layout (location = 1) in vec3 colour;\n"
-        "out vec3 vertexColour;\n"
-        "void main() {\n"
-        "gl_Position = vec4(position.x, position.y, 0.0, 1.0);\n"
-        "vertexColour = colour;\n"
-        "}\0";
-
-const GLchar* fragmentShaderSource = "#version 330 core\n"
-        "in vec3 vertexColour;\n"
-        "out vec4 color;\n"
-        "void main() {\n"
-        "color = vec4(vertexColour,1.0f);\n"
-        "}\0";
 
 void key_callback(GLFWwindow* w, int key, int code, int action, int mode) {
         if(key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
@@ -129,35 +115,11 @@ int main(int argc, char** argv) {
         glBindVertexArray(0);  // Reset the VAO binding.
         */
                 
-        // Compile Shaders and check success
-        GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-        glShaderSource(vertexShader,1,&vertexShaderSource,NULL);
-        glCompileShader(vertexShader);
-
-        GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-        glShaderSource(fragmentShader,1,&fragmentShaderSource,NULL);
-        glCompileShader(fragmentShader);
-
-        /*
-        GLint success;
-        GLchar infoLog[512];
-        glGetShaderiv(vertexShader,GL_COMPILE_STATUS,&success);
-
-        if(!success) {
-                glGetShaderInfoLog(vertexShader,512,NULL,infoLog);
-                printf("Vertex Shader failed to compile:\n%s\n", infoLog);
-        }
-        */
-
-        // Shader Programs - linking shaders
-        GLuint shaderProgram = glCreateProgram();
-        glAttachShader(shaderProgram,vertexShader);
-        glAttachShader(shaderProgram,fragmentShader);
-        glLinkProgram(shaderProgram);
-
-        // No longer needed.
-        glDeleteShader(vertexShader);
-        glDeleteShader(fragmentShader);
+        // Create Shader Program
+        log_info("Making shader program.");
+        shaders_t* shaders = oglsShaders("vertex.glsl", "fragment.glsl");
+        GLuint shaderProgram = oglsProgram(shaders);
+        oglsDestroy(shaders);
         
         // Draw in Wireframe mode
         //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -170,15 +132,6 @@ int main(int argc, char** argv) {
                 glClear(GL_COLOR_BUFFER_BIT);
 
                 glUseProgram(shaderProgram);
-
-                // Setting fragment shader colour over time.
-                GLfloat timeValue = glfwGetTime();
-                GLfloat greenValue = (sin(timeValue) / 2) + 0.5;
-                GLint vColourLoc = glGetUniformLocation(shaderProgram,"ourColour");
-
-                // Draw object
-                glUniform4f(vColourLoc,0.0f,greenValue,0.0f,1.0f);
-
                 glBindVertexArray(VAO1);
                 glDrawArrays(GL_TRIANGLES,0,3);
                 //glDrawElements(GL_TRIANGLES,6,GL_UNSIGNED_INT,0);
@@ -197,7 +150,7 @@ int main(int argc, char** argv) {
         // Clean up.
         glfwTerminate();
 
-        printf("And done.\n");
+        log_info("And done.");
 
         return EXIT_SUCCESS;
 }
