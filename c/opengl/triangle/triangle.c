@@ -31,6 +31,12 @@ int main(int argc, char** argv) {
                 0.0f,0.5f,   0.0f,0.0f,1.0f   // Top
         };
 
+        GLfloat texCoords[] = {
+                0.0f,0.0f,
+                1.0f,0.0f,
+                0.5f,1.0f
+        };
+
         /*
         GLfloat tri1[] = {
                 -0.5f,0.5f,
