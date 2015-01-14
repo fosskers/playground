@@ -132,6 +132,11 @@ int main(int argc, char** argv) {
                 glClear(GL_COLOR_BUFFER_BIT);
 
                 glUseProgram(shaderProgram);
+
+                // Set Uniform offset
+                GLint offset = glGetUniformLocation(shaderProgram,"offset");
+                glUniform1f(offset,0.25f);
+
                 glBindVertexArray(VAO1);
                 glDrawArrays(GL_TRIANGLES,0,3);
                 //glDrawElements(GL_TRIANGLES,6,GL_UNSIGNED_INT,0);
