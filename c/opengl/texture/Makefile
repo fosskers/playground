@@ -1,0 +1,24 @@
+TARGET=texture
+WARNINGS=-Wall -Wshadow -Wunreachable-code
+CFLAGS=$(WARNINGS) -g -O -fdiagnostics-color
+LDFLAGS=-lGL -lglfw -lGLEW -lpthread -lm -lSOIL
+HEADERS=ogls/opengl-shader.h ogls/dbg.h ogls/colour.h
+OBJECTS=ogls/opengl-shaders.o texture.o
+
+default: $(TARGET)
+all: default
+
+%.o: %.c $(HEADERS)
+	gcc $(CFLAGS) -c $< -o $@
+
+texture: $(OBJECTS)
+	gcc $(OBJECTS) $(CFLAGS) $(LDFLAGS) -o $@
+
+clean:
+	rm -f $(OBJECTS)
+	rm -f $(TARGET)
+
+# Compile Check
+cc:
+	make clean
+	make all
