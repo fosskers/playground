@@ -27,6 +27,9 @@ fLens g (F c f s p) = F <$> g c <*> g f <*> g s <*> g p
 sandwich :: Food
 sandwich = bread <> bread <> cheese <> chicken
 
+chickenBagel :: Food
+chickenBagel = bagel <> cheese <> chicken
+
 meal :: Food
 meal = sauce' <> pasta'
   where sauce' = sauce & foodLens //~ 4
@@ -62,3 +65,6 @@ chicken = F 231 5 0 43
 
 bread :: Food
 bread = F 110 2 17 6
+
+bagel :: Food
+bagel = F 340 4 61 12
