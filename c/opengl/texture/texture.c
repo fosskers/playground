@@ -5,6 +5,7 @@
 #include <SOIL/SOIL.h>
 #include <math.h>
 
+#include "ogll/opengl-linalg.h"
 #include "ogls/opengl-shaders.h"
 #include "ogls/dbg.h"
 
@@ -51,11 +52,20 @@ int main(int argc, char** argv) {
         // Register callbacks.
         glfwSetKeyCallback(w, key_callback);
 
+        // Create Shader Program
+        log_info("Making shader program.");
+        shaders_t* shaders = oglsShaders("vertex.glsl", "fragment.glsl");
+        GLuint shaderProgram = oglsProgram(shaders);
+        oglsDestroy(shaders);
+
+        check(shaderProgram > 0, "Shaders didn't compile.");
+        log_info("Shaders good.");
+
         // Element buffer
         GLuint EBO;
         glGenBuffers(1,&EBO);
         
-        // Vertex Array 1
+        // Vertex Array
         GLuint VAO;
         glGenVertexArrays(1,&VAO);
 
@@ -110,8 +120,8 @@ int main(int argc, char** argv) {
         check(img, "Face image didn't load.");
         glGenTextures(1,&face_tex);
         glBindTexture(GL_TEXTURE_2D,face_tex);
-        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_MIRRORED_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_MIRRORED_REPEAT);
         glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
         glTexImage2D(GL_TEXTURE_2D,0,GL_RGB,width,height,
@@ -121,15 +131,6 @@ int main(int argc, char** argv) {
         glBindTexture(GL_TEXTURE_2D,0);
 
         log_info("Face texture created.");
-        
-        // Create Shader Program
-        log_info("Making shader program.");
-        shaders_t* shaders = oglsShaders("vertex.glsl", "fragment.glsl");
-        GLuint shaderProgram = oglsProgram(shaders);
-        oglsDestroy(shaders);
-
-        check(shaderProgram > 0, "Shaders didn't compile.");
-        log_info("Shaders good.");
 
         // Draw in Wireframe mode
         //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -150,6 +151,14 @@ int main(int argc, char** argv) {
                 glActiveTexture(GL_TEXTURE1);
                 glBindTexture(GL_TEXTURE_2D, face_tex);
                 glUniform1i(glGetUniformLocation(shaderProgram,"tex2"),1);
+
+                // Applying transformations
+                matrix_t* m = ogllMIdentity(4);
+                ogllMScale(m,0.5);
+                ogllMSet(m,3,3,1);
+
+                GLuint transformLoc = glGetUniformLocation(shaderProgram,"transform");
+                glUniformMatrix4fv(transformLoc,1,GL_TRUE,m->m);
 
                 glBindVertexArray(VAO);
                 glDrawElements(GL_TRIANGLES,6,GL_UNSIGNED_INT,0);

@@ -2,17 +2,18 @@ TARGET=texture
 WARNINGS=-Wall -Wshadow -Wunreachable-code
 CFLAGS=$(WARNINGS) -g -O -fdiagnostics-color
 LDFLAGS=-lGL -lglfw -lGLEW -lpthread -lm -lSOIL
-HEADERS=ogls/opengl-shader.h ogls/dbg.h ogls/colour.h
-OBJECTS=ogls/opengl-shaders.o texture.o
+HEADERS=ogls/opengl-shader.h ogls/dbg.h ogls/colour.h ogll/opengl-linalg.h
+OBJECTS=ogls/opengl-shaders.o ogll/opengl-linalg.o texture.o
+COMPILER=gcc
 
 default: $(TARGET)
 all: default
 
 %.o: %.c $(HEADERS)
-	gcc $(CFLAGS) -c $< -o $@
+	$(COMPILER) $(CFLAGS) -c $< -o $@
 
 texture: $(OBJECTS)
-	gcc $(OBJECTS) $(CFLAGS) $(LDFLAGS) -o $@
+	$(COMPILER) $(OBJECTS) $(CFLAGS) $(LDFLAGS) -o $@
 
 clean:
 	rm -f $(OBJECTS)
