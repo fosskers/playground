@@ -134,6 +134,11 @@ int main(int argc, char** argv) {
 
         // Draw in Wireframe mode
         //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+        // Applying transformations
+        matrix_t* m = ogllMIdentity(4);
+        ogllMScale(m,0.5);
+        m = ogllM4Rotate(m,2);
         
         // Render until you shouldn't.
         while(!glfwWindowShouldClose(w)) {
@@ -152,13 +157,8 @@ int main(int argc, char** argv) {
                 glBindTexture(GL_TEXTURE_2D, face_tex);
                 glUniform1i(glGetUniformLocation(shaderProgram,"tex2"),1);
 
-                // Applying transformations
-                matrix_t* m = ogllMIdentity(4);
-                ogllMScale(m,0.5);
-                ogllMSet(m,3,3,1);
-
                 GLuint transformLoc = glGetUniformLocation(shaderProgram,"transform");
-                glUniformMatrix4fv(transformLoc,1,GL_TRUE,m->m);
+                glUniformMatrix4fv(transformLoc,1,GL_FALSE,m->m);
 
                 glBindVertexArray(VAO);
                 glDrawElements(GL_TRIANGLES,6,GL_UNSIGNED_INT,0);
