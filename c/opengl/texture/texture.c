@@ -18,6 +18,7 @@ void key_callback(GLFWwindow* w, int key, int code, int action, int mode) {
 }
 
 int main(int argc, char** argv) {
+        matrix_t* t = NULL;  // Transformation matrix.
         GLfloat verts[] = {
                 // Coords    // Colours       // Texture Coords
                 0.5f,0.5f,   1.0f,0.0f,0.0f,  1.0f,1.0f,
@@ -136,10 +137,12 @@ int main(int argc, char** argv) {
         //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
         // Applying transformations
-        matrix_t* m = ogllMIdentity(4);
-        ogllMScale(m,0.5);
-        m = ogllM4Rotate(m,2);
-        
+        t = ogllMIdentity(4);
+        ogllMScale(t,0.5);
+        //        ogllM4TranslateInPlace(t,0.5f,-0.5f,0.0f);
+        GLfloat rot = 0.05f;
+        GLfloat scl = 0.0f;
+
         // Render until you shouldn't.
         while(!glfwWindowShouldClose(w)) {
                 glfwPollEvents();
@@ -158,8 +161,12 @@ int main(int argc, char** argv) {
                 glUniform1i(glGetUniformLocation(shaderProgram,"tex2"),1);
 
                 GLuint transformLoc = glGetUniformLocation(shaderProgram,"transform");
-                glUniformMatrix4fv(transformLoc,1,GL_FALSE,m->m);
-
+                //                scl = ((int)(glfwGetTime() * 1000) % 1000) / 10000.0;
+                //                ogllMScale(t,scl);
+                t = ogllM4RotateInPlace(t,rot);
+                check(t, "Rotation failed.");
+                glUniformMatrix4fv(transformLoc,1,GL_FALSE,t->m);
+                
                 glBindVertexArray(VAO);
                 glDrawElements(GL_TRIANGLES,6,GL_UNSIGNED_INT,0);
                 glBindVertexArray(0);
@@ -170,10 +177,12 @@ int main(int argc, char** argv) {
 
         // Clean up.
         glfwTerminate();
+        ogllMDestroy(t);
 
         log_info("And done.");
 
         return EXIT_SUCCESS;
  error:
+        if(t) { ogllMDestroy(t); }
         return EXIT_FAILURE;
 }
