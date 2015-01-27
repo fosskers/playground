@@ -136,11 +136,15 @@ int main(int argc, char** argv) {
         // Draw in Wireframe mode
         //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-        // Applying transformations
+        // Construct Model Matrix
         t = ogllMIdentity(4);
         ogllMScale(t,0.5);
-        //        ogllM4TranslateInPlace(t,0.5f,-0.5f,0.0f);
         GLfloat rot = 0.05f;
+        GLfloat axis[3] = {0,0,1};
+        matrix_t* unit  = ogllVFromArray(3,axis);
+
+        matrix_t* p = ogllMPerspectiveP(tau/8, (float)width/(float)height,
+                                       0.1f,1000.f);
 
         // Render until you shouldn't.
         while(!glfwWindowShouldClose(w)) {
@@ -162,7 +166,7 @@ int main(int argc, char** argv) {
                 GLuint transformLoc = glGetUniformLocation(shaderProgram,"transform");
                 //                rot = (float)glfwGetTime() / 10.0;
                 //                ogllMScale(t,scl);
-                t = ogllM4RotateInPlace(t,rot);
+                t = ogllM4Rotate(t,rot,unit);
                 check(t, "Rotation failed.");
                 glUniformMatrix4fv(transformLoc,1,GL_FALSE,t->m);
                 
