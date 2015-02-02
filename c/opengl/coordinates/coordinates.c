@@ -231,6 +231,7 @@ int main(int argc, char** argv) {
         matrix_t* proj = ogllMPerspectiveP(tau/8, (float)width/(float)height,
                                            0.1f,1000.0f);
 
+        GLfloat len,x,y,z;
         // Render until you shouldn't.
         while(!glfwWindowShouldClose(w)) {
                 glfwPollEvents();
@@ -257,11 +258,24 @@ int main(int argc, char** argv) {
                 
                 glBindVertexArray(VAO);
                 for(i = 0, j = 0; j < 10; i += 3, j++) {
-                        models[j] = ogllM4Rotate(models[j],
-                                                 angle,
-                                                 unit->m[0],
-                                                 unit->m[1],
-                                                 unit->m[2]);
+                        len = sqrt(cubePositions[i] * cubePositions[i] +
+                                   cubePositions[i+1] * cubePositions[i+1] +
+                                   cubePositions[i+2] * cubePositions[i+2]);
+
+                        // We need this as Point (0,0,0) results in an
+                        // invalid rotation axis.
+                        if(len == 0) {
+                                x = 1;
+                                y = 0;
+                                z = 0;
+                        } else {
+                                x = cubePositions[i] / len;
+                                y = cubePositions[i+1] / len;
+                                z = cubePositions[i+2] / len;
+                        }
+
+                        models[j] = ogllM4Rotate(models[j],angle,x,y,z);
+
                         glUniformMatrix4fv(modelLoc,1,GL_FALSE,models[j]->m);
                         glDrawArrays(GL_TRIANGLES,0,36);
                 }
