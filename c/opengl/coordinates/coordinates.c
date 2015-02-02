@@ -18,7 +18,7 @@ void key_callback(GLFWwindow* w, int key, int code, int action, int mode) {
 }
 
 int main(int argc, char** argv) {
-        matrix_t* t = NULL;  // Transformation matrix.
+        /*
         GLfloat verts[] = {
                 // Coords    // Colours       // Texture Coords
                 0.5f,0.5f,   1.0f,0.0f,0.0f,  1.0f,1.0f,
@@ -26,7 +26,64 @@ int main(int argc, char** argv) {
                 -0.5f,-0.5f, 0.0f,0.0f,1.0f,  0.0f,0.0f,
                 -0.5f,0.5f,  1.0f,1.0f,0.0f,  0.0f,1.0f
         };
+        */
+        GLfloat verts[] = {
+                -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+                0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+                0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+                0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+                -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+                -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
 
+                -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+                0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+                0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+                0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+                -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+                -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+                -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+                -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+                -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+                -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+                -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+                -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+                0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+                0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+                0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+                0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+                0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+                0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+                -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+                0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+                0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+                0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+                -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+                -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+                -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+                0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+                0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+                0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+                -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+                -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+        };
+
+        GLfloat cubePositions[] = {
+                0.0f, 0.0f, 0.0f,
+                2.0f, 5.0f, -15.0f,
+                -1.5f, -2.2f, -2.5f,
+                -3.8f, -2.0f, -12.3f,
+                2.4f, -0.4f, -3.5f,
+                -1.7f, 3.0f, -7.5f,
+                1.3f, -2.0f, -2.5f,
+                1.5f, 2.0f, -2.5f,
+                1.5f, 0.2f, -1.5f,
+                -1.3f, 1.0f, -1.5f
+        };
+        
         GLuint ixs[] = {
                 0,1,3,
                 1,2,3
@@ -53,6 +110,9 @@ int main(int argc, char** argv) {
         // Register callbacks.
         glfwSetKeyCallback(w, key_callback);
 
+        // Depth Testing
+        glEnable(GL_DEPTH_TEST);
+        
         // Create Shader Program
         log_info("Making shader program.");
         shaders_t* shaders = oglsShaders("vertex.glsl", "fragment.glsl");
@@ -81,6 +141,15 @@ int main(int argc, char** argv) {
         glBufferData(GL_ELEMENT_ARRAY_BUFFER,sizeof(ixs),ixs,GL_STATIC_DRAW);
         
         // Tell OpenGL how to process Vertex data.
+        glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,
+                              5 * sizeof(GLfloat),(GLvoid*)0);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(1,2,GL_FLOAT,GL_FALSE,
+                              5 * sizeof(GLfloat),
+                              (GLvoid*)(3 * sizeof(GLfloat)));
+        glEnableVertexAttribArray(1);
+
+        /*
         glVertexAttribPointer(0,2,GL_FLOAT,GL_FALSE,
                               7 * sizeof(GLfloat),(GLvoid*)0);
         glEnableVertexAttribArray(0);
@@ -92,6 +161,7 @@ int main(int argc, char** argv) {
                               7 * sizeof(GLfloat),
                               (GLvoid*)(5 * sizeof(GLfloat)));
         glEnableVertexAttribArray(2);
+        */
         glBindVertexArray(0);  // Reset the VAO binding.
 
         // Box Texture
@@ -136,22 +206,37 @@ int main(int argc, char** argv) {
         // Draw in Wireframe mode
         //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-        // Construct Model Matrix
-        t = ogllMIdentity(4);
-        ogllMScale(t,0.5);
-        GLfloat rot = 0.05f;
-        GLfloat axis[3] = {0,0,1};
+        // Model Matrices
+        matrix_t* model = ogllMIdentity(4);
+        GLfloat axis[3] = {1/sqrt(3),1/sqrt(3),1/sqrt(3)};
         matrix_t* unit  = ogllVFromArray(3,axis);
+        matrix_t* models[10];
+        GLuint i,j;
+        GLfloat angle = 0.05;
 
-        matrix_t* p = ogllMPerspectiveP(tau/8, (float)width/(float)height,
-                                       0.1f,1000.f);
+        // Initialize MMs
+        for(i = 0, j = 0; j < 10; i+=3, j++) {
+                models[j] = ogllMIdentity(4);
+                models[j] = ogllM4Translate(models[j],
+                                            cubePositions[i],
+                                            cubePositions[i+1],
+                                            cubePositions[i+2]);
+        }
+
+        // View Matrix
+        matrix_t* view = ogllMIdentity(4);
+        view = ogllM4Translate(view,0,0,-3);
+
+        // Projection Matrix
+        matrix_t* proj = ogllMPerspectiveP(tau/8, (float)width/(float)height,
+                                           0.1f,1000.0f);
 
         // Render until you shouldn't.
         while(!glfwWindowShouldClose(w)) {
                 glfwPollEvents();
 
                 glClearColor(0.2f,0.3f,0.3f,1.0f);
-                glClear(GL_COLOR_BUFFER_BIT);
+                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
                 glUseProgram(shaderProgram);
 
@@ -163,15 +248,24 @@ int main(int argc, char** argv) {
                 glBindTexture(GL_TEXTURE_2D, face_tex);
                 glUniform1i(glGetUniformLocation(shaderProgram,"tex2"),1);
 
-                GLuint transformLoc = glGetUniformLocation(shaderProgram,"transform");
-                //                rot = (float)glfwGetTime() / 10.0;
-                //                ogllMScale(t,scl);
-                t = ogllM4Rotate(t,rot,unit);
-                check(t, "Rotation failed.");
-                glUniformMatrix4fv(transformLoc,1,GL_FALSE,t->m);
+                GLuint modelLoc = glGetUniformLocation(shaderProgram,"model");
+                GLuint viewLoc  = glGetUniformLocation(shaderProgram,"view");
+                GLuint projLoc  = glGetUniformLocation(shaderProgram,"proj");
+
+                glUniformMatrix4fv(viewLoc,1,GL_FALSE,view->m);
+                glUniformMatrix4fv(projLoc,1,GL_FALSE,proj->m);
                 
                 glBindVertexArray(VAO);
-                glDrawElements(GL_TRIANGLES,6,GL_UNSIGNED_INT,0);
+                for(i = 0, j = 0; j < 10; i += 3, j++) {
+                        models[j] = ogllM4Rotate(models[j],
+                                                 angle,
+                                                 unit->m[0],
+                                                 unit->m[1],
+                                                 unit->m[2]);
+                        glUniformMatrix4fv(modelLoc,1,GL_FALSE,models[j]->m);
+                        glDrawArrays(GL_TRIANGLES,0,36);
+                }
+
                 glBindVertexArray(0);
 
                 // Always comes last.
@@ -180,12 +274,16 @@ int main(int argc, char** argv) {
 
         // Clean up.
         glfwTerminate();
-        ogllMDestroy(t);
+        ogllMDestroy(model);
+        ogllMDestroy(view);
+        ogllMDestroy(proj);
 
         log_info("And done.");
 
         return EXIT_SUCCESS;
  error:
-        if(t) { ogllMDestroy(t); }
+        if(model) { ogllMDestroy(model); }
+        if(view)  { ogllMDestroy(view); }
+        if(proj)  { ogllMDestroy(proj); }
         return EXIT_FAILURE;
 }
