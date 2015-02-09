@@ -18,15 +18,6 @@ void key_callback(GLFWwindow* w, int key, int code, int action, int mode) {
 }
 
 int main(int argc, char** argv) {
-        /*
-        GLfloat verts[] = {
-                // Coords    // Colours       // Texture Coords
-                0.5f,0.5f,   1.0f,0.0f,0.0f,  1.0f,1.0f,
-                0.5f,-0.5f,  0.0f,1.0f,0.0f,  1.0f,0.0f,
-                -0.5f,-0.5f, 0.0f,0.0f,1.0f,  0.0f,0.0f,
-                -0.5f,0.5f,  1.0f,1.0f,0.0f,  0.0f,1.0f
-        };
-        */
         GLfloat verts[] = {
                 -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
                 0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
@@ -84,11 +75,6 @@ int main(int argc, char** argv) {
                 -1.3f, 1.0f, -1.5f
         };
         
-        GLuint ixs[] = {
-                0,1,3,
-                1,2,3
-        };
-        
         // Initial settings.
         glfwInit();
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -122,10 +108,6 @@ int main(int argc, char** argv) {
         check(shaderProgram > 0, "Shaders didn't compile.");
         log_info("Shaders good.");
 
-        // Element buffer
-        GLuint EBO;
-        glGenBuffers(1,&EBO);
-        
         // Vertex Array
         GLuint VAO;
         glGenVertexArrays(1,&VAO);
@@ -136,9 +118,6 @@ int main(int argc, char** argv) {
         glGenBuffers(1,&VBO);
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
         glBufferData(GL_ARRAY_BUFFER,sizeof(verts),verts,GL_STATIC_DRAW);
-
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,EBO);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER,sizeof(ixs),ixs,GL_STATIC_DRAW);
         
         // Tell OpenGL how to process Vertex data.
         glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,
@@ -149,19 +128,6 @@ int main(int argc, char** argv) {
                               (GLvoid*)(3 * sizeof(GLfloat)));
         glEnableVertexAttribArray(1);
 
-        /*
-        glVertexAttribPointer(0,2,GL_FLOAT,GL_FALSE,
-                              7 * sizeof(GLfloat),(GLvoid*)0);
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(1,3,GL_FLOAT,GL_FALSE,
-                              7 * sizeof(GLfloat),
-                              (GLvoid*)(2 * sizeof(GLfloat)));
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(2,2,GL_FLOAT,GL_FALSE,
-                              7 * sizeof(GLfloat),
-                              (GLvoid*)(5 * sizeof(GLfloat)));
-        glEnableVertexAttribArray(2);
-        */
         glBindVertexArray(0);  // Reset the VAO binding.
 
         // Box Texture
@@ -203,13 +169,7 @@ int main(int argc, char** argv) {
 
         log_info("Face texture created.");
 
-        // Draw in Wireframe mode
-        //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
         // Model Matrices
-        matrix_t* model = ogllMIdentity(4);
-        GLfloat axis[3] = {1/sqrt(3),1/sqrt(3),1/sqrt(3)};
-        matrix_t* unit  = ogllVFromArray(3,axis);
         matrix_t* models[10];
         GLuint i,j;
         GLfloat angle = 0.05;
@@ -223,9 +183,21 @@ int main(int argc, char** argv) {
                                             cubePositions[i+2]);
         }
 
+        // Camera
+        GLfloat camFS[] = {0,0,2};
+        matrix_t* camPos = ogllVFromArray(3,camFS);
+        camFS[0] = 0; camFS[1] = 0; camFS[2] = 0;
+        matrix_t* camTar = ogllVFromArray(3,camFS);
+        camFS[0] = 0; camFS[1] = 1; camFS[2] = 0;
+        matrix_t* up = ogllVFromArray(3,camFS);
+
         // View Matrix
         matrix_t* view = ogllMIdentity(4);
         view = ogllM4Translate(view,0,0,-4);
+        matrix_t* view2 = ogllM4LookAtP(camPos,camTar,up);
+        ogllMPrint(view);
+        puts("---");
+        ogllMPrint(view2);
 
         // Projection Matrix
         matrix_t* proj = ogllMPerspectiveP(tau/8, (float)width/(float)height,
@@ -253,7 +225,7 @@ int main(int argc, char** argv) {
                 GLuint viewLoc  = glGetUniformLocation(shaderProgram,"view");
                 GLuint projLoc  = glGetUniformLocation(shaderProgram,"proj");
 
-                glUniformMatrix4fv(viewLoc,1,GL_FALSE,view->m);
+                glUniformMatrix4fv(viewLoc,1,GL_FALSE,view2->m);
                 glUniformMatrix4fv(projLoc,1,GL_FALSE,proj->m);
                 
                 glBindVertexArray(VAO);
@@ -288,7 +260,6 @@ int main(int argc, char** argv) {
 
         // Clean up.
         glfwTerminate();
-        ogllMDestroy(model);
         ogllMDestroy(view);
         ogllMDestroy(proj);
 
@@ -296,7 +267,6 @@ int main(int argc, char** argv) {
 
         return EXIT_SUCCESS;
  error:
-        if(model) { ogllMDestroy(model); }
         if(view)  { ogllMDestroy(view); }
         if(proj)  { ogllMDestroy(proj); }
         return EXIT_FAILURE;
