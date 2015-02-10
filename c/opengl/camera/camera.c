@@ -11,9 +11,20 @@
 
 // --- //
 
+// Camera
+matrix_t* camPos;
+matrix_t* camDir;
+matrix_t* camUp;
+
 void key_callback(GLFWwindow* w, int key, int code, int action, int mode) {
+        GLfloat camSpeed = 0.05f;
+
         if(key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
                 glfwSetWindowShouldClose(w, GL_TRUE);
+        } else if(key == GLFW_KEY_W) {
+                ogllMAdd(camPos,camDir);
+        } else if(key == GLFW_KEY_S) {
+                ogllMSub(camPos,camDir);
         }
 }
 
@@ -184,20 +195,16 @@ int main(int argc, char** argv) {
         }
 
         // Camera
-        GLfloat camFS[] = {0,0,2};
-        matrix_t* camPos = ogllVFromArray(3,camFS);
-        camFS[0] = 0; camFS[1] = 0; camFS[2] = 0;
-        matrix_t* camTar = ogllVFromArray(3,camFS);
+        GLfloat camFS[] = {0,0,4};
+        camPos = ogllVFromArray(3,camFS);
+        camFS[0] = 0; camFS[1] = 0; camFS[2] = 1;
+        camDir = ogllVFromArray(3,camFS);
+        matrix_t* camTar = ogllMAddP(camPos,camDir);
         camFS[0] = 0; camFS[1] = 1; camFS[2] = 0;
-        matrix_t* up = ogllVFromArray(3,camFS);
+        camUp = ogllVFromArray(3,camFS);
 
         // View Matrix
-        matrix_t* view = ogllMIdentity(4);
-        view = ogllM4Translate(view,0,0,-4);
-        matrix_t* view2 = ogllM4LookAtP(camPos,camTar,up);
-        ogllMPrint(view);
-        puts("---");
-        ogllMPrint(view2);
+        matrix_t* view = ogllM4LookAtP(camPos,camDir,camUp);
 
         // Projection Matrix
         matrix_t* proj = ogllMPerspectiveP(tau/8, (float)width/(float)height,
@@ -225,7 +232,12 @@ int main(int argc, char** argv) {
                 GLuint viewLoc  = glGetUniformLocation(shaderProgram,"view");
                 GLuint projLoc  = glGetUniformLocation(shaderProgram,"proj");
 
-                glUniformMatrix4fv(viewLoc,1,GL_FALSE,view2->m);
+                ogllMDestroy(view);
+                ogllMDestroy(camTar);
+                camTar = ogllMAddP(camPos,camDir);
+                view = ogllM4LookAtP(camPos,camTar,camUp);
+                
+                glUniformMatrix4fv(viewLoc,1,GL_FALSE,view->m);
                 glUniformMatrix4fv(projLoc,1,GL_FALSE,proj->m);
                 
                 glBindVertexArray(VAO);
