@@ -18,6 +18,7 @@ matrix_t* camUp;
 
 void key_callback(GLFWwindow* w, int key, int code, int action, int mode) {
         GLfloat camSpeed = 0.05f;
+        matrix_t* temp;
 
         if(key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
                 glfwSetWindowShouldClose(w, GL_TRUE);
@@ -25,6 +26,18 @@ void key_callback(GLFWwindow* w, int key, int code, int action, int mode) {
                 ogllMAdd(camPos,camDir);
         } else if(key == GLFW_KEY_S) {
                 ogllMSub(camPos,camDir);
+        } else if(key == GLFW_KEY_A) {
+                temp = ogllVNormalize(ogllVCrossP(camDir,camUp));
+
+                ogllMSub(camPos,temp);
+
+                ogllMDestroy(temp);
+        } else if(key == GLFW_KEY_D) {
+                temp = ogllVNormalize(ogllVCrossP(camDir,camUp));
+
+                ogllMAdd(camPos,temp);
+
+                ogllMDestroy(temp);
         }
 }
 
@@ -197,7 +210,7 @@ int main(int argc, char** argv) {
         // Camera
         GLfloat camFS[] = {0,0,4};
         camPos = ogllVFromArray(3,camFS);
-        camFS[0] = 0; camFS[1] = 0; camFS[2] = 1;
+        camFS[0] = 0; camFS[1] = 0; camFS[2] = -1;
         camDir = ogllVFromArray(3,camFS);
         matrix_t* camTar = ogllMAddP(camPos,camDir);
         camFS[0] = 0; camFS[1] = 1; camFS[2] = 0;
@@ -232,6 +245,7 @@ int main(int argc, char** argv) {
                 GLuint viewLoc  = glGetUniformLocation(shaderProgram,"view");
                 GLuint projLoc  = glGetUniformLocation(shaderProgram,"proj");
 
+                // Update View Matrix
                 ogllMDestroy(view);
                 ogllMDestroy(camTar);
                 camTar = ogllMAddP(camPos,camDir);
