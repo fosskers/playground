@@ -15,29 +15,43 @@
 matrix_t* camPos;
 matrix_t* camDir;
 matrix_t* camUp;
+bool keys[1024];  // Why 1024?
 
-void key_callback(GLFWwindow* w, int key, int code, int action, int mode) {
-        GLfloat camSpeed = 0.05f;
+void moveCamera() {
         matrix_t* temp;
 
-        if(key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
-                glfwSetWindowShouldClose(w, GL_TRUE);
-        } else if(key == GLFW_KEY_W) {
+        // Seperate ifs, since all could be pressed.
+        if(keys[GLFW_KEY_W]) {
                 ogllMAdd(camPos,camDir);
-        } else if(key == GLFW_KEY_S) {
+        }
+        if(keys[GLFW_KEY_S]) {
                 ogllMSub(camPos,camDir);
-        } else if(key == GLFW_KEY_A) {
+        }
+        if(keys[GLFW_KEY_A]) {
                 temp = ogllVNormalize(ogllVCrossP(camDir,camUp));
 
                 ogllMSub(camPos,temp);
 
                 ogllMDestroy(temp);
-        } else if(key == GLFW_KEY_D) {
+        }
+        if(keys[GLFW_KEY_D]) {
                 temp = ogllVNormalize(ogllVCrossP(camDir,camUp));
 
                 ogllMAdd(camPos,temp);
 
                 ogllMDestroy(temp);
+        }
+}
+
+void key_callback(GLFWwindow* w, int key, int code, int action, int mode) {
+        if(key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+                glfwSetWindowShouldClose(w, GL_TRUE);
+        }
+
+        if(action == GLFW_PRESS) {
+                keys[key] = true;
+        } else if(action == GLFW_RELEASE) {
+                keys[key] = false;
         }
 }
 
@@ -227,6 +241,7 @@ int main(int argc, char** argv) {
         // Render until you shouldn't.
         while(!glfwWindowShouldClose(w)) {
                 glfwPollEvents();
+                moveCamera();
 
                 glClearColor(0.2f,0.3f,0.3f,1.0f);
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
