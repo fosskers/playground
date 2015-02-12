@@ -38,6 +38,19 @@ meal = sauce' <> pasta'
 sauce :: Food
 sauce = sauceBase <> sauceBase <> groundChicken <> onion
 
+{-| RANDOM -}
+ritter :: Food
+ritter = F 220 15 19 3 & foodLens *~ 3
+
+aloe :: Food
+aloe = F 70 0 17 0 & foodLens *~ (500/180)
+
+jarritos :: Food
+jarritos = F 110 0 28 0 & foodLens *~ (370 / 240)
+
+chiliCan :: Food
+chiliCan = F 280 10 33 17 & foodLens *~ (397/255)
+
 -- Cambell's Chunky
 soup :: Food
 soup = F 150 5 20 7 & foodLens *~ 2.16
