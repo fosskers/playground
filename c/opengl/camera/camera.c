@@ -16,6 +16,8 @@ matrix_t* camPos;
 matrix_t* camDir;
 matrix_t* camUp;
 bool keys[1024];  // Why 1024?
+GLfloat yaw = 0;  // These are in radians.
+GLfloat pitch = 0;
 
 void moveCamera() {
         matrix_t* temp;
@@ -53,6 +55,43 @@ void key_callback(GLFWwindow* w, int key, int code, int action, int mode) {
         } else if(action == GLFW_RELEASE) {
                 keys[key] = false;
         }
+}
+
+void mouse_callback(GLFWwindow * w, double xpos, double ypos) {
+        static GLfloat lastX = 400;
+        static GLfloat lastY = 300;
+        static bool firstMouse = true;  // Don't touch.
+
+        if(firstMouse) {
+                lastX = xpos;
+                lastY = ypos;
+                firstMouse = false;
+        }
+
+        GLfloat xoffset = xpos - lastX;
+        GLfloat yoffset = lastY - ypos;
+        lastX = xpos;
+        lastY = ypos;
+
+        // Scale by mouse sensitivity factor
+        GLfloat sensitivity = 0.05f;
+        xoffset *= sensitivity;
+        yoffset *= sensitivity;
+
+        // Update camera angles.
+        yaw   += xoffset;
+        pitch -= yoffset;
+        if(pitch > tau/4) {
+                pitch = 4 * tau / 17;
+        } else if(pitch < -tau/4) {
+                pitch = -4 * tau / 17;
+        }
+
+        // Update Camera Dir Vector
+        camDir->m[0] = cos(yaw) * cos(pitch);
+        camDir->m[1] = sin(pitch);
+        camDir->m[2] = sin(yaw) * cos(pitch);
+        ogllVNormalize(camDir);
 }
 
 int main(int argc, char** argv) {
@@ -133,6 +172,10 @@ int main(int argc, char** argv) {
 
         // Register callbacks.
         glfwSetKeyCallback(w, key_callback);
+
+        // Take Mouse input.
+        glfwSetInputMode(w,GLFW_CURSOR,GLFW_CURSOR_DISABLED);
+        glfwSetCursorPosCallback(w,mouse_callback);
 
         // Depth Testing
         glEnable(GL_DEPTH_TEST);
