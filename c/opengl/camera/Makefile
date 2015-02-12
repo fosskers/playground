@@ -2,8 +2,8 @@ TARGET=camera
 WARNINGS=-Wall -Wshadow -Wunreachable-code
 CFLAGS=$(WARNINGS) -g -O -fdiagnostics-color
 LDFLAGS=-lGL -lglfw -lGLEW -lpthread -lm -lSOIL
-HEADERS=ogls/opengl-shader.h ogls/dbg.h ogls/colour.h ogll/opengl-linalg.h
-OBJECTS=ogls/opengl-shaders.o ogll/opengl-linalg.o camera.o
+HEADERS=cog/shaders/shader.h cog/dbg.h cog/colour.h cog/linalg/linalg.h cog/camera/camera.h
+OBJECTS=cog/shaders/shaders.o cog/linalg/linalg.o cog/camera/camera.o camera.o
 COMPILER=gcc
 
 default: $(TARGET)

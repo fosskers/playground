@@ -5,44 +5,28 @@
 #include <SOIL/SOIL.h>
 #include <math.h>
 
-#include "ogll/opengl-linalg.h"
-#include "ogls/opengl-shaders.h"
-#include "ogls/dbg.h"
+#include "cog/camera/camera.h"
+#include "cog/dbg.h"
+#include "cog/linalg/linalg.h"
+#include "cog/shaders/shaders.h"
 
 // --- //
 
+#define initialAspect tau/8
+
 // Camera
-matrix_t* camPos;
-matrix_t* camDir;
-matrix_t* camUp;
+camera_t* camera;
 bool keys[1024];  // Why 1024?
-GLfloat yaw = 0;  // These are in radians.
-GLfloat pitch = 0;
+GLfloat deltaTime = 0;
+GLfloat lastFrame = 0;
+GLfloat aspect = initialAspect;
 
 void moveCamera() {
-        matrix_t* temp;
-
-        // Seperate ifs, since all could be pressed.
-        if(keys[GLFW_KEY_W]) {
-                ogllMAdd(camPos,camDir);
-        }
-        if(keys[GLFW_KEY_S]) {
-                ogllMSub(camPos,camDir);
-        }
-        if(keys[GLFW_KEY_A]) {
-                temp = ogllVNormalize(ogllVCrossP(camDir,camUp));
-
-                ogllMSub(camPos,temp);
-
-                ogllMDestroy(temp);
-        }
-        if(keys[GLFW_KEY_D]) {
-                temp = ogllVNormalize(ogllVCrossP(camDir,camUp));
-
-                ogllMAdd(camPos,temp);
-
-                ogllMDestroy(temp);
-        }
+        cogcMove(camera,
+                 keys[GLFW_KEY_W],
+                 keys[GLFW_KEY_S],
+                 keys[GLFW_KEY_A],
+                 keys[GLFW_KEY_D]);
 }
 
 void key_callback(GLFWwindow* w, int key, int code, int action, int mode) {
@@ -58,40 +42,21 @@ void key_callback(GLFWwindow* w, int key, int code, int action, int mode) {
 }
 
 void mouse_callback(GLFWwindow * w, double xpos, double ypos) {
-        static GLfloat lastX = 400;
-        static GLfloat lastY = 300;
-        static bool firstMouse = true;  // Don't touch.
+        cogcPan(camera,xpos,ypos);
+}
 
-        if(firstMouse) {
-                lastX = xpos;
-                lastY = ypos;
-                firstMouse = false;
+void scroll_callback(GLFWwindow* w, double xoffset, double yoffset) {
+        GLfloat threshold = tau/100;
+        
+        if(aspect >= threshold && aspect <= initialAspect + 0.0001) {
+                aspect -= yoffset / 10.0;
         }
-
-        GLfloat xoffset = xpos - lastX;
-        GLfloat yoffset = lastY - ypos;
-        lastX = xpos;
-        lastY = ypos;
-
-        // Scale by mouse sensitivity factor
-        GLfloat sensitivity = 0.05f;
-        xoffset *= sensitivity;
-        yoffset *= sensitivity;
-
-        // Update camera angles.
-        yaw   += xoffset;
-        pitch -= yoffset;
-        if(pitch > tau/4) {
-                pitch = 4 * tau / 17;
-        } else if(pitch < -tau/4) {
-                pitch = -4 * tau / 17;
+        // Correction if they zoom past a threshold.
+        if(aspect <= threshold) {
+                aspect = threshold;
+        } else if(aspect >= initialAspect) {
+                aspect = initialAspect;
         }
-
-        // Update Camera Dir Vector
-        camDir->m[0] = cos(yaw) * cos(pitch);
-        camDir->m[1] = sin(pitch);
-        camDir->m[2] = sin(yaw) * cos(pitch);
-        ogllVNormalize(camDir);
 }
 
 int main(int argc, char** argv) {
@@ -176,15 +141,20 @@ int main(int argc, char** argv) {
         // Take Mouse input.
         glfwSetInputMode(w,GLFW_CURSOR,GLFW_CURSOR_DISABLED);
         glfwSetCursorPosCallback(w,mouse_callback);
+        glfwSetScrollCallback(w,scroll_callback);
 
         // Depth Testing
         glEnable(GL_DEPTH_TEST);
+
+        // Testing
+        debug("tau/100: %f", tau/100);
+        debug("tau/8: %f", tau/8);
         
         // Create Shader Program
         log_info("Making shader program.");
-        shaders_t* shaders = oglsShaders("vertex.glsl", "fragment.glsl");
-        GLuint shaderProgram = oglsProgram(shaders);
-        oglsDestroy(shaders);
+        shaders_t* shaders = cogsShaders("vertex.glsl", "fragment.glsl");
+        GLuint shaderProgram = cogsProgram(shaders);
+        cogsDestroy(shaders);
 
         check(shaderProgram > 0, "Shaders didn't compile.");
         log_info("Shaders good.");
@@ -257,8 +227,8 @@ int main(int argc, char** argv) {
 
         // Initialize MMs
         for(i = 0, j = 0; j < 10; i+=3, j++) {
-                models[j] = ogllMIdentity(4);
-                models[j] = ogllM4Translate(models[j],
+                models[j] = coglMIdentity(4);
+                models[j] = coglM4Translate(models[j],
                                             cubePositions[i],
                                             cubePositions[i+1],
                                             cubePositions[i+2]);
@@ -266,18 +236,18 @@ int main(int argc, char** argv) {
 
         // Camera
         GLfloat camFS[] = {0,0,4};
-        camPos = ogllVFromArray(3,camFS);
+        matrix_t* camPos = coglVFromArray(3,camFS);
         camFS[0] = 0; camFS[1] = 0; camFS[2] = -1;
-        camDir = ogllVFromArray(3,camFS);
-        matrix_t* camTar = ogllMAddP(camPos,camDir);
+        matrix_t* camDir = coglVFromArray(3,camFS);
         camFS[0] = 0; camFS[1] = 1; camFS[2] = 0;
-        camUp = ogllVFromArray(3,camFS);
+        matrix_t* camUp = coglVFromArray(3,camFS);
+        camera = cogcCreate(camPos,camDir,camUp);
 
         // View Matrix
-        matrix_t* view = ogllM4LookAtP(camPos,camDir,camUp);
+        matrix_t* view = coglM4LookAtP(camPos,camDir,camUp);
 
         // Projection Matrix
-        matrix_t* proj = ogllMPerspectiveP(tau/8, (float)width/(float)height,
+        matrix_t* proj = coglMPerspectiveP(aspect, (float)width/(float)height,
                                            0.1f,1000.0f);
 
         GLfloat len,x,y,z;
@@ -286,6 +256,11 @@ int main(int argc, char** argv) {
                 glfwPollEvents();
                 moveCamera();
 
+                // Update Frame info
+                GLfloat currentFrame = glfwGetTime();
+                deltaTime = currentFrame - lastFrame;
+                lastFrame = currentFrame;
+                
                 glClearColor(0.2f,0.3f,0.3f,1.0f);
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -304,10 +279,8 @@ int main(int argc, char** argv) {
                 GLuint projLoc  = glGetUniformLocation(shaderProgram,"proj");
 
                 // Update View Matrix
-                ogllMDestroy(view);
-                ogllMDestroy(camTar);
-                camTar = ogllMAddP(camPos,camDir);
-                view = ogllM4LookAtP(camPos,camTar,camUp);
+                coglMDestroy(view);
+                view = coglM4LookAtP(camera->pos,camera->tar,camera->up);
                 
                 glUniformMatrix4fv(viewLoc,1,GL_FALSE,view->m);
                 glUniformMatrix4fv(projLoc,1,GL_FALSE,proj->m);
@@ -330,7 +303,7 @@ int main(int argc, char** argv) {
                                 z = cubePositions[i+2] / len;
                         }
 
-                        models[j] = ogllM4Rotate(models[j],angle,x,y,z);
+                        models[j] = coglM4Rotate(models[j],angle,x,y,z);
 
                         glUniformMatrix4fv(modelLoc,1,GL_FALSE,models[j]->m);
                         glDrawArrays(GL_TRIANGLES,0,36);
@@ -344,14 +317,14 @@ int main(int argc, char** argv) {
 
         // Clean up.
         glfwTerminate();
-        ogllMDestroy(view);
-        ogllMDestroy(proj);
+        coglMDestroy(view);
+        coglMDestroy(proj);
 
         log_info("And done.");
 
         return EXIT_SUCCESS;
  error:
-        if(view)  { ogllMDestroy(view); }
-        if(proj)  { ogllMDestroy(proj); }
+        if(view)  { coglMDestroy(view); }
+        if(proj)  { coglMDestroy(proj); }
         return EXIT_FAILURE;
 }
