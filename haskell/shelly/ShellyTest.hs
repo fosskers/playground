@@ -10,6 +10,7 @@ import           Shelly
 ---
 
 -- Notice the `pipe` operator.
+-- Also, while `Sh` is a Monad, (-|-) is not (>>=).
 foo :: IO T.Text
 foo = shelly . silently $ run "cat" ["ShellyTest.hs"] -|- run "grep" ["Text"]
 
@@ -39,6 +40,7 @@ bad = shelly $ pwd >> terror "Noooo!"
 hello :: Sh ()
 hello = echo "Hello" >> sleep 1 >> echo "Still here?"
 
+-- Time some operation
 timing :: IO (Double,())
 timing = shelly $ time hello
 
