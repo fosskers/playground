@@ -13,6 +13,8 @@
 // --- //
 
 #define initialAspect tau/8
+#define wWidth  800
+#define wHeight 600
 
 // Camera
 camera_t* camera;
@@ -125,7 +127,7 @@ int main(int argc, char** argv) {
         glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
         
         // Make a window.
-        GLFWwindow* w = glfwCreateWindow(800,600,"OpenGL!",NULL,NULL);
+        GLFWwindow* w = glfwCreateWindow(wWidth,wHeight,"OpenGL!",NULL,NULL);
         glfwMakeContextCurrent(w);
 
         // Fire up GLEW.
@@ -133,7 +135,7 @@ int main(int argc, char** argv) {
         glewInit();
 
         // For the rendering window.
-        glViewport(0,0,800,600);
+        glViewport(0,0,wWidth,wHeight);
 
         // Register callbacks.
         glfwSetKeyCallback(w, key_callback);
@@ -145,10 +147,6 @@ int main(int argc, char** argv) {
 
         // Depth Testing
         glEnable(GL_DEPTH_TEST);
-
-        // Testing
-        debug("tau/100: %f", tau/100);
-        debug("tau/8: %f", tau/8);
         
         // Create Shader Program
         log_info("Making shader program.");
@@ -247,7 +245,8 @@ int main(int argc, char** argv) {
         matrix_t* view = coglM4LookAtP(camPos,camDir,camUp);
 
         // Projection Matrix
-        matrix_t* proj = coglMPerspectiveP(aspect, (float)width/(float)height,
+        matrix_t* proj = coglMPerspectiveP(aspect, 
+                                           (float)wWidth/(float)wHeight,
                                            0.1f,1000.0f);
 
         GLfloat len,x,y,z;
@@ -280,8 +279,11 @@ int main(int argc, char** argv) {
 
                 // Update View Matrix
                 coglMDestroy(view);
+                coglMDestroy(proj);
                 view = coglM4LookAtP(camera->pos,camera->tar,camera->up);
-                
+                proj = coglMPerspectiveP(aspect, (float)wWidth/(float)wHeight,
+                                           0.1f,1000.0f);
+
                 glUniformMatrix4fv(viewLoc,1,GL_FALSE,view->m);
                 glUniformMatrix4fv(projLoc,1,GL_FALSE,proj->m);
                 

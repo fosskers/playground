@@ -26,15 +26,17 @@ int main(int argc, char** argv) {
          * and are translated to screen coordinates later.
          */
         GLfloat verts[] = {
-                0.5f,-0.5f,  1.0f,0.0f,0.0f,  // BR
-                -0.5f,-0.5f, 0.0f,1.0f,0.0f,  // BL
-                0.0f,0.5f,   0.0f,0.0f,1.0f   // Top
-        };
-
-        GLfloat texCoords[] = {
-                0.0f,0.0f,
-                1.0f,0.0f,
-                0.5f,1.0f
+                -0.9f, -0.5f, 0.0f,  // Left
+                -0.0f, -0.5f, 0.0f,  // Right
+                -0.45f, 0.5f, 0.0f,  // Top
+                // Second triangle
+                0.0f, -0.5f, 0.0f,  // Left
+                0.9f, -0.5f, 0.0f,  // Right
+                0.45f, 0.5f, 0.0f,  // Top
+                // Third Triangle
+                0.0f, -0.5, 0.0,     // Bottom
+                -0.45, 0.5, 0.0,    // Left
+                0.45, 0.5, 0.0
         };
 
         /*
@@ -98,12 +100,14 @@ int main(int argc, char** argv) {
         //glBufferData(GL_ELEMENT_ARRAY_BUFFER,sizeof(ixs),ixs,GL_STATIC_DRAW);
 
         // Tell OpenGL how to process Vertex data.
-        glVertexAttribPointer(0,2,GL_FLOAT,GL_FALSE,
-                              5 * sizeof(GLfloat),(GLvoid*)0);
+        glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,
+                              3 * sizeof(GLfloat),(GLvoid*)0);
         glEnableVertexAttribArray(0);
+        /*
         glVertexAttribPointer(1,3,GL_FLOAT,GL_FALSE,
                               5 * sizeof(GLfloat),(GLvoid*)(2 * sizeof(GLfloat)));
         glEnableVertexAttribArray(1);
+        */
         glBindVertexArray(0);  // Reset the VAO binding.
 
         /*
@@ -144,7 +148,7 @@ int main(int argc, char** argv) {
                 glUniform1f(offset,0.25f);
 
                 glBindVertexArray(VAO1);
-                glDrawArrays(GL_TRIANGLES,0,3);
+                glDrawArrays(GL_TRIANGLES,0,9);
                 //glDrawElements(GL_TRIANGLES,6,GL_UNSIGNED_INT,0);
                 glBindVertexArray(0);
 
