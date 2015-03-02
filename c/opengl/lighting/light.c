@@ -223,6 +223,7 @@ int main(int argc, char** argv) {
                                  0.1f,1000.0f);
 
         // Set Light Position
+        glUseProgram(cShaderP);
         GLuint lightPosLoc = glGetUniformLocation(cShaderP,"lightPos");
         glUniform3f(lightPosLoc,lightPos->m[0],lightPos->m[1],lightPos->m[2]);
 
@@ -247,7 +248,7 @@ int main(int argc, char** argv) {
                 GLuint lightL = glGetUniformLocation(cShaderP,"lightColour");
                 glUniform3f(cubeL,1.0f,0.5f,0.31f);
                 glUniform3f(lightL,1.0f,1.0f,1.0f);
-                
+
                 GLuint modelLoc = glGetUniformLocation(cShaderP,"model");
                 GLuint viewLoc  = glGetUniformLocation(cShaderP,"view");
                 GLuint projLoc  = glGetUniformLocation(cShaderP,"proj");
