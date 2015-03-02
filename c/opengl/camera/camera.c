@@ -13,7 +13,7 @@
 // --- //
 
 #define initialAspect tau/8
-#define wWidth  800
+#define wWidth  1000
 #define wHeight 600
 
 // Camera
@@ -25,6 +25,7 @@ GLfloat aspect = initialAspect;
 
 void moveCamera() {
         cogcMove(camera,
+                 deltaTime,
                  keys[GLFW_KEY_W],
                  keys[GLFW_KEY_S],
                  keys[GLFW_KEY_A],
@@ -32,7 +33,7 @@ void moveCamera() {
 }
 
 void key_callback(GLFWwindow* w, int key, int code, int action, int mode) {
-        if(key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+        if(key == GLFW_KEY_Q && action == GLFW_PRESS) {
                 glfwSetWindowShouldClose(w, GL_TRUE);
         }
 

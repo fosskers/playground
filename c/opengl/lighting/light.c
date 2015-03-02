@@ -20,11 +20,24 @@
 matrix_t* lightPos = NULL;
 
 // Camera
-camera_t* camera;
+camera_t* camera = NULL;
 bool keys[1024];  // Why 1024?
 GLfloat deltaTime = 0;
 GLfloat lastFrame = 0;
 GLfloat aspect = initialAspect;
+
+// --- //
+
+/* Init/Reset the Camera */
+void resetCamera() {
+        if(camera) { cogcDestroy(camera); }
+
+        matrix_t* camPos = coglV3(0,0,4);
+        matrix_t* camDir = coglV3(0,0,-1);
+        matrix_t* camUp  = coglV3(0,1,0);
+
+        camera = cogcCreate(camPos,camDir,camUp);
+}
 
 void moveCamera() {
         cogcMove(camera,
@@ -36,11 +49,14 @@ void moveCamera() {
 }
 
 void key_callback(GLFWwindow* w, int key, int code, int action, int mode) {
-        if(key == GLFW_KEY_Q && action == GLFW_PRESS) {
-                glfwSetWindowShouldClose(w, GL_TRUE);
-        }
-
         if(action == GLFW_PRESS) {
+                if(key == GLFW_KEY_Q) {
+                        glfwSetWindowShouldClose(w, GL_TRUE);
+                }
+                else if(key == GLFW_KEY_C) {
+                        resetCamera();
+                }
+
                 keys[key] = true;
         } else if(action == GLFW_RELEASE) {
                 keys[key] = false;
@@ -184,25 +200,22 @@ int main(int argc, char** argv) {
         glBindVertexArray(0);
 
         // Light Source Position and Model Matrix
-        lightPos = coglV3(5.0f,1.0f,4.0f);
+        lightPos = coglV3(1.2f,1.0f,2.0f);
         matrix_t* lModel = coglMIdentity(4);
+        lModel = coglMScale(lModel,0.2f);
         lModel = coglM4Translate(lModel,
                                  lightPos->m[0],
                                  lightPos->m[1],
                                  lightPos->m[2]);
-        lModel = coglMScale(lModel,0.2f);
         
         // Cube's Model Matrix
         matrix_t* cModel = coglMIdentity(4);
 
         // Camera
-        matrix_t* camPos = coglV3(0,0,4);
-        matrix_t* camDir = coglV3(0,0,-1);
-        matrix_t* camUp  = coglV3(0,1,0);
-        camera = cogcCreate(camPos,camDir,camUp);
+        resetCamera();
 
         // View Matrix
-        view = coglM4LookAtP(camPos,camDir,camUp);
+        view = coglM4LookAtP(camera->pos,camera->tar,camera->up);
 
         // Projection Matrix
         proj = coglMPerspectiveP(aspect, 

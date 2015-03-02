@@ -15,7 +15,7 @@ void main() {
         float diff = max(dot(norm,lightDir),0.0);
         vec3 diffuse = diff * lightColour;
 
-        float ambientStr = 0.1f;
+        float ambientStr = 0.25f;
         vec3 ambient = ambientStr * lightColour;
 
         colour = vec4((ambient + diffuse) * cubeColour, 1.0f);
