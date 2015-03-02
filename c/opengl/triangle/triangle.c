@@ -4,8 +4,15 @@
 #include <GLFW/glfw3.h>
 #include <math.h>
 
-#include "ogls/opengl-shaders.h"
-#include "ogls/dbg.h"
+#include "cog/linalg/linalg.h"
+#include "cog/shaders/shaders.h"
+#include "cog/dbg.h"
+#include "cog/camera/camera.h"
+
+#define WIDTH 800
+#define HEIGHT 600
+
+camera_t* camera;
 
 /* NOTES
  * We should use `GL` prefixed types, as OpenGL sets these up in
@@ -15,7 +22,7 @@
 // --- //
 
 void key_callback(GLFWwindow* w, int key, int code, int action, int mode) {
-        if(key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+        if(key == GLFW_KEY_Q && action == GLFW_PRESS) {
                 glfwSetWindowShouldClose(w, GL_TRUE);
         }
 }
@@ -34,9 +41,9 @@ int main(int argc, char** argv) {
                 0.9f, -0.5f, 0.0f,  // Right
                 0.45f, 0.5f, 0.0f,  // Top
                 // Third Triangle
-                0.0f, -0.5, 0.0,     // Bottom
-                -0.45, 0.5, 0.0,    // Left
-                0.45, 0.5, 0.0
+                0.0f, -0.45, 0.0,     // Bottom
+                -0.45, 0.55, 0.0,    // Left
+                0.45, 0.55, 0.0
         };
 
         /*
@@ -67,7 +74,7 @@ int main(int argc, char** argv) {
         glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
         
         // Make a window.
-        GLFWwindow* w = glfwCreateWindow(800,600,"OpenGL!",NULL,NULL);
+        GLFWwindow* w = glfwCreateWindow(WIDTH,HEIGHT,"OpenGL!",NULL,NULL);
         glfwMakeContextCurrent(w);
 
         // Fire up GLEW.
@@ -75,7 +82,7 @@ int main(int argc, char** argv) {
         glewInit();
 
         // For the rendering window.
-        glViewport(0,0,800,600);
+        glViewport(0,0,WIDTH,HEIGHT);
 
         // Register callbacks.
         glfwSetKeyCallback(w, key_callback);
@@ -127,13 +134,32 @@ int main(int argc, char** argv) {
                 
         // Create Shader Program
         log_info("Making shader program.");
-        shaders_t* shaders = oglsShaders("vertex.glsl", "fragment.glsl");
-        GLuint shaderProgram = oglsProgram(shaders);
-        oglsDestroy(shaders);
-        
-        // Draw in Wireframe mode
-        //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        
+        shaders_t* shaders = cogsShaders("vertex.glsl", "fragment.glsl");
+        GLuint shaderProgram = cogsProgram(shaders);
+        cogsDestroy(shaders);
+
+        // Camera
+        matrix_t* camPos = coglV3(0,0,2);
+        matrix_t* camDir = coglV3(0,0,-1);
+        matrix_t* camUp  = coglV3(0,1,0);
+        camera = cogcCreate(camPos,camDir,camUp);
+
+        // View Matrix
+        matrix_t* view = coglM4LookAtP(camPos,camDir,camUp);
+        coglMPrint(view);
+        puts("---");
+
+        // Projection Matrix
+        matrix_t* proj = coglMPerspectiveP(tau/8,
+                                           (float)WIDTH/(float)HEIGHT,
+                                           0.1f,1000.0f);
+        coglMPrint(proj);
+        glUseProgram(shaderProgram);
+        GLuint projLoc = glGetUniformLocation(shaderProgram,"proj");
+        GLuint viewLoc = glGetUniformLocation(shaderProgram,"view");
+        glUniformMatrix4fv(projLoc,1,GL_FALSE,proj->m);
+        glUniformMatrix4fv(viewLoc,1,GL_FALSE,view->m);
+
         // Render until you shouldn't.
         while(!glfwWindowShouldClose(w)) {
                 glfwPollEvents();

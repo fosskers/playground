@@ -2,17 +2,18 @@ TARGET=triangle
 WARNINGS=-Wall -Wshadow -Wunreachable-code
 CFLAGS=$(WARNINGS) -g -O -fdiagnostics-color
 LDFLAGS=-lGL -lglfw -lGLEW -lpthread -lm
-HEADERS=ogls/opengl-shader.h ogls/dbg.h ogls/colour.h
-OBJECTS=ogls/opengl-shaders.o triangle.o
+HEADERS=cog/shaders/shaders.h cog/linalg/linalg.h cog/camera/camera.h cog/dbg.h cog/colour.h
+OBJECTS=cog/shaders/shaders.o cog/linalg/linalg.o cog/camera/camera.o triangle.o
+COMPILER=clang
 
 default: $(TARGET)
 all: default
 
 %.o: %.c $(HEADERS)
-	gcc $(CFLAGS) -c $< -o $@
+	$(COMPILER) $(CFLAGS) -c $< -o $@
 
 triangle: $(OBJECTS)
-	gcc $(OBJECTS) $(CFLAGS) $(LDFLAGS) -o $@
+	$(COMPILER) $(OBJECTS) $(CFLAGS) $(LDFLAGS) -o $@
 
 clean:
 	rm -f $(OBJECTS)
