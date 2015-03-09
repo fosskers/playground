@@ -251,13 +251,15 @@ int main(int argc, char** argv) {
                 glUniform3f(cubeL,1.0f,0.5f,0.31f);
                 glUniform3f(lightL,1.0f,1.0f,1.0f);
 
+                /*
                 GLuint viewPosLoc = glGetUniformLocation(cShaderP,"viewPos");
                 glUniform3f(viewPosLoc,
                             camera->pos->m[0],
                             camera->pos->m[1],
                             camera->pos->m[2]);
+                */
 
-                GLuint nModlLoc = glGetUniformLocation(cShaderP,"normModel");
+                //GLuint nModlLoc = glGetUniformLocation(cShaderP,"normModel");
                 GLuint modelLoc = glGetUniformLocation(cShaderP,"model");
                 GLuint viewLoc  = glGetUniformLocation(cShaderP,"view");
                 GLuint projLoc  = glGetUniformLocation(cShaderP,"proj");
@@ -269,7 +271,7 @@ int main(int argc, char** argv) {
                 proj = coglMPerspectiveP(aspect, (float)wWidth/(float)wHeight,
                                          0.1f,1000.0f);
 
-                glUniformMatrix4fv(nModlLoc,1,GL_FALSE,nModel->m);
+                //glUniformMatrix4fv(nModlLoc,1,GL_FALSE,nModel->m);
                 glUniformMatrix4fv(modelLoc,1,GL_FALSE,cModel->m);
                 glUniformMatrix4fv(viewLoc,1,GL_FALSE,view->m);
                 glUniformMatrix4fv(projLoc,1,GL_FALSE,proj->m);
