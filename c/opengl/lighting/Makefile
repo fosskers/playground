@@ -2,8 +2,8 @@ TARGET=light
 WARNINGS=-Wall -Wshadow -Wunreachable-code
 CFLAGS=$(WARNINGS) -g -O -fdiagnostics-color
 LDFLAGS=-lGL -lglfw -lGLEW -lpthread -lm
-HEADERS=cog/shaders/shader.h cog/dbg.h cog/colour.h cog/linalg/linalg.h cog/camera/camera.h
-OBJECTS=cog/shaders/shaders.o cog/linalg/linalg.o cog/camera/camera.o light.o
+HEADERS=cog/shaders/shader.h cog/dbg.h cog/colour.h cog/util.h cog/linalg/linalg.h cog/camera/camera.h
+OBJECTS=cog/util.o cog/shaders/shaders.o cog/linalg/linalg.o cog/camera/camera.o light.o
 COMPILER=clang
 
 default: $(TARGET)
