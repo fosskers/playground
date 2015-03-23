@@ -51,6 +51,9 @@ jarritos = F 110 0 28 0 & foodLens *~ (370 / 240)
 chiliCan :: Food
 chiliCan = F 280 10 33 17 & foodLens *~ (397/255)
 
+nutella :: Food
+nutella = F 100 6 11 1 & foodLens *~ (500/19)
+
 -- Cambell's Chunky
 soup :: Food
 soup = F 150 5 20 7 & foodLens *~ 2.16

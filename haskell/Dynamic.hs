@@ -21,10 +21,10 @@ knapsack _ [] = ([],0,0)
 knapsack w ((xo,xv,xw):xs)
   | w - xw < 0 = ([],0,0)
   | otherwise = fromJust $ maximumByOf both (compare `on` (^. _2)) (a,b)
-  where a = knapsack (w - xw) xs & _1 %~ (cons $ xo)
+  where a = knapsack w xs
+        b = knapsack (w - xw) xs & _1 %~ (cons xo)
                                  & _2 +~ xv
                                  & _3 +~ xw
-        b = knapsack w xs
 
 foo :: [(Object,Value,Weight)]
 foo = [ (1,5,3)
