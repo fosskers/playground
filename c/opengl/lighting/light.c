@@ -228,6 +228,25 @@ int main(int argc, char** argv) {
                                  (float)wWidth/(float)wHeight,
                                  0.1f,1000.0f);
 
+        /* Set Material values  */
+        glUseProgram(cShaderP);
+        GLint matAmL = glGetUniformLocation(cShaderP, "material.ambient");
+        GLint matDiL = glGetUniformLocation(cShaderP, "material.diffuse");
+        GLint matSpL = glGetUniformLocation(cShaderP, "material.specular");
+        GLint matShL = glGetUniformLocation(cShaderP, "material.shininess");
+        glUniform3f(matAmL, 1.0f, 0.5f, 0.31f);
+        glUniform3f(matDiL, 1.0f, 0.5f, 0.31f);
+        glUniform3f(matSpL, 0.5f, 0.5f, 0.5f);
+        glUniform1f(matShL, 32.0f);
+
+        /* Set Lighting values */
+        GLint liAmL = glGetUniformLocation(cShaderP, "light.ambient");
+        GLint liDiL = glGetUniformLocation(cShaderP, "light.diffuse");
+        GLint liSpL = glGetUniformLocation(cShaderP, "light.specular");
+        glUniform3f(liAmL, 0.2f, 0.2f, 0.2f);
+        glUniform3f(liDiL, 0.5f, 0.5f, 0.5f);
+        glUniform3f(liSpL, 1.0f, 1.0f, 1.0f);
+
         // Render until you shouldn't.
         while(!glfwWindowShouldClose(w)) {
                 glfwPollEvents();
@@ -246,7 +265,7 @@ int main(int argc, char** argv) {
 
                 // Update light position
                 coglMDestroy(lightPos);
-                lightAngle += tau/128;
+                lightAngle += tau/256;
                 lightPos = coglV3(2*cos(lightAngle),1.0f,2*sin(lightAngle));
 
                 // Set colours
