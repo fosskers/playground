@@ -17,7 +17,9 @@
 #define wHeight 600
 
 // Light Source
+matrix_t* lModel = NULL;
 matrix_t* lightPos = NULL;
+GLfloat lightAngle = 0.0f;
 
 // Camera
 camera_t* camera = NULL;
@@ -200,8 +202,10 @@ int main(int argc, char** argv) {
         glBindVertexArray(0);
 
         // Light Source Position and Model Matrix
-        lightPos = coglV3(1.2f,1.0f,2.0f);
-        matrix_t* lModel = coglMIdentity(4);
+        //lightPos = coglV3(1.2f,1.0f,2.0f);
+        // We'll start with a radius of 1.
+        lightPos = coglV3(1.0f,1.0f,0.0f);
+        lModel = coglMIdentity(4);
         lModel = coglMScale(lModel,0.2f);
         lModel = coglM4Translate(lModel,
                                  lightPos->m[0],
@@ -224,11 +228,6 @@ int main(int argc, char** argv) {
                                  (float)wWidth/(float)wHeight,
                                  0.1f,1000.0f);
 
-        // Set Light Position
-        glUseProgram(cShaderP);
-        GLuint lightPosLoc = glGetUniformLocation(cShaderP,"lightPos");
-        glUniform3f(lightPosLoc,lightPos->m[0],lightPos->m[1],lightPos->m[2]);
-
         // Render until you shouldn't.
         while(!glfwWindowShouldClose(w)) {
                 glfwPollEvents();
@@ -245,19 +244,21 @@ int main(int argc, char** argv) {
                 /* Draw Cube */
                 glUseProgram(cShaderP);
 
+                // Update light position
+                coglMDestroy(lightPos);
+                lightAngle += tau/128;
+                lightPos = coglV3(2*cos(lightAngle),1.0f,2*sin(lightAngle));
+
                 // Set colours
                 GLuint cubeL  = glGetUniformLocation(cShaderP,"cubeColour");
                 GLuint lightL = glGetUniformLocation(cShaderP,"lightColour");
                 glUniform3f(cubeL,1.0f,0.5f,0.31f);
                 glUniform3f(lightL,1.0f,1.0f,1.0f);
 
-                /*
-                GLuint viewPosLoc = glGetUniformLocation(cShaderP,"viewPos");
-                glUniform3f(viewPosLoc,
-                            camera->pos->m[0],
-                            camera->pos->m[1],
-                            camera->pos->m[2]);
-                */
+                // Set light position
+                GLuint lightPosLoc = glGetUniformLocation(cShaderP,"lightPos");
+                glUniform3f(lightPosLoc,
+                            lightPos->m[0],lightPos->m[1],lightPos->m[2]);
 
                 //GLuint nModlLoc = glGetUniformLocation(cShaderP,"normModel");
                 GLuint modelLoc = glGetUniformLocation(cShaderP,"model");
@@ -271,7 +272,6 @@ int main(int argc, char** argv) {
                 proj = coglMPerspectiveP(aspect, (float)wWidth/(float)wHeight,
                                          0.1f,1000.0f);
 
-                //glUniformMatrix4fv(nModlLoc,1,GL_FALSE,nModel->m);
                 glUniformMatrix4fv(modelLoc,1,GL_FALSE,cModel->m);
                 glUniformMatrix4fv(viewLoc,1,GL_FALSE,view->m);
                 glUniformMatrix4fv(projLoc,1,GL_FALSE,proj->m);
@@ -282,6 +282,16 @@ int main(int argc, char** argv) {
                 
                 /* Draw Light Source */
                 glUseProgram(lShaderP);
+
+                // Update Lamp position
+                coglMDestroy(lModel);
+                lModel = coglMIdentity(4);
+                lModel = coglMScale(lModel,0.2f);
+                lModel = coglM4Rotate(lModel,-lightAngle,0,1,0);
+                lModel = coglM4Translate(lModel,
+                                         lightPos->m[0],
+                                         lightPos->m[1],
+                                         lightPos->m[2]);
 
                 modelLoc = glGetUniformLocation(lShaderP,"model");
                 viewLoc  = glGetUniformLocation(lShaderP,"view");
