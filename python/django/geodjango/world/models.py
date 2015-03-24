@@ -10,7 +10,9 @@ class Trip(models.Model):
     departure_datetime = models.DateTimeField()
 
     def __unicode__(self):
-        return "{:.3f}".format(self.distance())
+        return "From: ({:.2f},{:.2f}) to ({:.2f},{:.2f})".format(
+            self.origin.coords[0], self.origin.coords[1],
+            self.destination.coords[0], self.destination.coords[1])
 
     def distance(self):
         """The distance between origin and destination."""
