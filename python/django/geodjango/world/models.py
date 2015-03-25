@@ -5,9 +5,14 @@ from django.contrib.gis.db import models
 
 class Trip(models.Model):
     """A simulated HitchPlanet trip."""
-    origin = models.PointField()
-    destination = models.PointField()
+    origin = models.PointField(spatial_index=True,
+                               srid=4326,
+                               geography=True)
+    destination = models.PointField(spatial_index=True,
+                                    srid=4326,
+                                    geography=True)
     departure_datetime = models.DateTimeField()
+    objects = models.GeoManager()
 
     def __unicode__(self):
         return "From: ({:.2f},{:.2f}) to ({:.2f},{:.2f})".format(

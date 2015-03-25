@@ -42,21 +42,21 @@ class Command(BaseCommand):
         Defaults:
           origin:      Vancouver
           destination: Whistler
-          radius:      20km search radius from both points
+          radius:      50km search radius from both points
         """
         start = time.time()
-        trips = sorted(
-            Trip.objects
-            .filter(origin__distance_lte=(origin, D(km=radius)))
-            .filter(destination__distance_lte=(destination, D(km=radius))),
-            key=lambda t: t.origin.distance(origin)
-        )
+        trips = Trip.objects \
+                    .filter(origin__distance_lte=(origin, D(km=radius))) \
+                    .filter(destination__distance_lte=(destination,
+                                                       D(km=radius)))
+        # self.stdout.write("{}".format(trips.query))
+        s_trips = sorted(trips, key=lambda t: t.origin.distance(origin))
         end = time.time()
 
         self.stdout.write(
-            "{} Trip(s) found in {:.3f} ms. Here are the first 10.".format(
-                len(trips), 1000 * (end - start))
+            "{} Trip(s) found in {:.3f} ms (radius {}km).".format(
+                len(trips), 1000 * (end - start), radius)
         )
 
-        for t in trips[:10]:
+        for t in s_trips[:10]:
             self.stdout.write(unicode(t))
