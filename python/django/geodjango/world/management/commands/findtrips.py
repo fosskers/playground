@@ -2,7 +2,7 @@
 # findtrips.py
 # author:   Colin Woodbury
 # created:  2015 March 23 @ 22:29
-# modified:
+# modified: 2015 March 25 @ 11:32
 #
 # Implements the `findtrips` management command.
 ##
@@ -24,14 +24,14 @@ class Command(BaseCommand):
         # 2015 March 23 @ 22:50 - There is something wrong with this.
         # It's bailing with a type error. `int()` doesn't work either,
         # nor can it stay as a string.
-        # radius = float(args[0]) if args else 20
+        # radius = float(args[0]) if args else 50.0
         # self.stdout.write("RADIUS: {} {}".format(radius, type(radius)))
-        self.find_trip()  # self.find_trip(radius)
+        self.find_trip()
 
     def find_trip(self,
                   origin=Point(-123.6, 49.15),
                   destination=Point(-122.57, 50.7),
-                  radius=50):
+                  radius=50.0):
         """Find all 'relevant' Trips. A Trip is relevant if its origin is
         within `radius` kilometers of a user specified origin, and its
         destination is within `radius` kilometers of a user specified
@@ -46,10 +46,10 @@ class Command(BaseCommand):
         """
         start = time.time()
         trips = Trip.objects \
-                    .filter(origin__distance_lte=(origin, D(km=radius))) \
-                    .filter(destination__distance_lte=(destination,
-                                                       D(km=radius)))
-        # self.stdout.write("{}".format(trips.query))
+                    .filter(origin__dwithin=(origin, radius * 1000)) \
+                    .filter(destination__dwithin=(destination, radius * 1000))
+
+        #self.stdout.write("{}".format(trips.query))
         s_trips = sorted(trips, key=lambda t: t.origin.distance(origin))
         end = time.time()
 
