@@ -19,10 +19,13 @@ library
   exposed-modules:     Dynamic
   -- other-modules:       
   other-extensions:    OverloadedStrings, ExtendedDefaultRules
-  build-depends:       base >=4.7 && <4.8
+  build-depends:       base >=4.7 && <5
+                     , extensible-effects >= 1.9.2.2
+                     , hashable >= 1.2.3.1
                      , lens
                      , random
                      , text
+                     , unordered-containers
 
   -- hs-source-dirs:      
   default-language:    Haskell2010
