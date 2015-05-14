@@ -1,15 +1,28 @@
 {-# LANGUAGE FlexibleContexts #-}
 
--- A replacement for Monad Transformers
+-- A replacement for Monad Transformers.
+-- Note that Reader/Writer/State here are reimplemented and are not
+-- Monads in themselves.
+-- That said, their usual functions ask/tell/get/etc. *are* Monadic
+-- in the `Eff` Monad.
 
 module Eff where
 
 import Control.Eff
+import Control.Eff.Exception
 import Control.Eff.Reader.Lazy
 import Control.Eff.Writer.Lazy
 import Control.Monad (when)
 
--- | Reader
+--------------
+--- READER ---
+--------------
+r1 :: Member (Reader Int) r => Int -> Eff r Int
+r1 n = (n +) <$> ask
+
+-- | It seems `(100 :: Int)` is necessary or it won't compile.
+r1t :: Int -> Int
+r1t n = run $ runReader (r1 n) (100 :: Int)
 
 --------------
 --- WRITER ---
@@ -20,3 +33,36 @@ w1 = mapM_ (\n -> when (even n) $ tell n)
 
 w1t :: Int
 w1t = fst . run $ runWriter (+) 0 (w1 [1..10])
+
+w2 :: Member (Writer String) r => String -> Eff r ()
+w2 s = tell $ s ++ "!"
+
+-- | Piping different effects within the `Eff` Monad.
+w3 :: (Member (Writer Int) r, Member (Writer String) r) => Eff r Bool
+w3 = w1 [1..10] >> w2 "Hello" >> return True
+
+-- | Multiple effects of similar type at once.
+-- Just use `run*` for each effect in the Effect set.
+w3t :: (Int, (String,Bool))
+w3t = run $ runWriter (+) 0 $ runMonoidWriter w3
+
+-- | Interleaving functions of "simpler" effects with more complicated ones.
+w4 :: (Member (Writer Int) r, Member (Writer String) r) => Eff r Bool
+w4 = w1 [1..5] >> w2 "Interleaving" >> w3
+
+w4t :: (Int, (String,Bool))
+w4t = run $ runWriter (+) 0 $ runMonoidWriter w4
+
+-----------------
+--- EXCEPTION ---
+-----------------
+-- | The infinite list will never be mapped over.
+e1 :: (Member (Writer Int) r, Member Fail r) => Eff r ()
+e1 = w1 [1..10] >> die >> w1 [1..]
+
+e1t :: (Int, Either () ())
+e1t = run $ runWriter (+) 0 $ runExc e1
+
+-- | Explicit error type.
+e2 :: (Member (Writer Int) r, Member (Exc String) r) => Eff r ()
+e2 = w1 [1..10] >> throwExc "Error!" >> w1 [1..]
