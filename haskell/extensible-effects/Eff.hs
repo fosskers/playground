@@ -9,7 +9,9 @@
 module Eff where
 
 import Control.Eff
+import Control.Eff.Choose
 import Control.Eff.Exception
+import Control.Eff.Fresh
 import Control.Eff.Reader.Lazy
 import Control.Eff.Writer.Lazy
 import Control.Monad (when)
@@ -32,7 +34,7 @@ w1 :: Member (Writer Int) r => [Int] -> Eff r ()
 w1 = mapM_ (\n -> when (even n) $ tell n)
 
 w1t :: Int
-w1t = fst . run $ runWriter (+) 0 (w1 [1..10])
+w1t = fst . run . runWriter (+) 0 $ w1 [1..10]
 
 w2 :: Member (Writer String) r => String -> Eff r ()
 w2 s = tell $ s ++ "!"
@@ -66,3 +68,32 @@ e1t = run $ runWriter (+) 0 $ runExc e1
 -- | Explicit error type.
 e2 :: (Member (Writer Int) r, Member (Exc String) r) => Eff r ()
 e2 = w1 [1..10] >> throwExc "Error!" >> w1 [1..]
+
+--------------
+--- CHOOSE ---
+--------------
+-- | This is just the List Monad.
+c1 :: Member Choose r => [Int] -> Eff r Int
+c1 ns = (*) <$> choose ns <*> choose ns
+
+c1t :: [Int]
+c1t = run . runChoice $ c1 [1..10]
+
+-- | Reinventing the wheel.
+map' :: (a -> b) -> [a] -> [b]
+map' f = run . runChoice . fmap f . choose
+
+-------------
+--- FRESH ---
+-------------
+-- | Should produce all the Ints.
+f1 :: Member (Fresh Int) r => Eff r [Int]
+f1 = sequence $ repeat fresh
+
+-- | Doesn't terminate for `take n f1t` where n > 0.
+f1t :: [Int]
+f1t = run $ runFresh f1 (1 :: Int)
+
+-----------------
+--- LIFT (IO) ---
+-----------------
