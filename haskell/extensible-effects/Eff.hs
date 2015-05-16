@@ -1,3 +1,4 @@
+{-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE FlexibleContexts #-}
 
 -- A replacement for Monad Transformers.
@@ -12,7 +13,9 @@ import Control.Eff
 import Control.Eff.Choose
 import Control.Eff.Exception
 import Control.Eff.Fresh
+import Control.Eff.Lift
 import Control.Eff.Reader.Lazy
+import Control.Eff.State.Lazy
 import Control.Eff.Writer.Lazy
 import Control.Monad (when)
 
@@ -97,3 +100,46 @@ f1t = run $ runFresh f1 (1 :: Int)
 -----------------
 --- LIFT (IO) ---
 -----------------
+-- | Monads don't commute, so there can only be one Lifted Monad per
+-- Effect set.
+-- Why does `SetMember` appear here and not in the others above?
+l1 :: SetMember Lift (Lift IO) r => Eff r ()
+l1 = lift $ print "時計が壊れた"
+
+-- | Notice we *don't* use `run` here.
+l1t :: IO ()
+l1t = runLift $ l1 >> l1
+
+-------------------
+--- INTERLEAVED ---
+-------------------
+data Dilithium = Dilithium
+
+-- | Why can't the type of the State value be inferred?
+engage :: (Member (State [Dilithium]) r, Member (Exc String) r) => Eff r ()
+engage = get >>= \(ds :: [Dilithium]) -> do
+  if length ds < 5
+     then throwExc "We're short on Dilithium, Cap'n!"
+     else modify (drop 5 :: [Dilithium] -> [Dilithium])
+
+loadCrystals :: Member (State [Dilithium]) r => [Dilithium] -> Eff r ()
+loadCrystals = modify . (++)
+
+captLog :: Member (Writer String) r => String -> Eff r ()
+captLog s = tell $ "Captain's Log: " ++ s
+
+voyage :: ( Member (Writer String) r
+          , Member (State [Dilithium]) r
+          , Member (Exc String) r
+          ) => Eff r ()
+voyage = do
+  captLog "Time for a cosmic adventure!"
+  captLog "Need to fill the tanks."
+  loadCrystals . take 18 $ repeat Dilithium
+  captLog "Engage!"
+  engage >> engage >> engage >> engage
+  captLog "We made it to our destination."
+
+vt :: (String, Either String ())
+vt = run $ evalState ([] :: [Dilithium]) $ runWriter f "" $ runExc voyage
+  where f acc s = acc ++ "\n" ++ s
