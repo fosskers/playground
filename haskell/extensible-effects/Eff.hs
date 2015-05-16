@@ -1,3 +1,4 @@
+{-# LANGUAGE ConstraintKinds #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE FlexibleContexts #-}
 
@@ -113,6 +114,11 @@ l1t = runLift $ l1 >> l1
 -------------------
 --- INTERLEAVED ---
 -------------------
+-- | This is thanks to the ConstraintKinds extension.
+type Effects r = ( Member (Writer String) r
+                 , Member (State [Dilithium]) r
+                 , Member (Exc String) r )
+
 data Dilithium = Dilithium
 
 -- | Why can't the type of the State value be inferred?
@@ -128,18 +134,20 @@ loadCrystals = modify . (++)
 captLog :: Member (Writer String) r => String -> Eff r ()
 captLog s = tell $ "Captain's Log: " ++ s
 
-voyage :: ( Member (Writer String) r
-          , Member (State [Dilithium]) r
-          , Member (Exc String) r
-          ) => Eff r ()
+fire :: IO ()
+fire = print "Kaboom!"
+
+voyage :: (Effects r, SetMember Lift (Lift IO) r) => Eff r ()
 voyage = do
   captLog "Time for a cosmic adventure!"
   captLog "Need to fill the tanks."
-  loadCrystals . take 18 $ repeat Dilithium
+  loadCrystals . take 25 $ repeat Dilithium
   captLog "Engage!"
   engage >> engage >> engage >> engage
   captLog "We made it to our destination."
+  captLog "Fire torpedos!"
+  lift fire
 
-vt :: (String, Either String ())
-vt = run $ evalState ([] :: [Dilithium]) $ runWriter f "" $ runExc voyage
+vt :: IO (String, Either String ())
+vt = runLift $ evalState ([] :: [Dilithium]) $ runWriter f "" $ runExc voyage
   where f acc s = acc ++ "\n" ++ s
