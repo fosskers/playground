@@ -17,6 +17,7 @@ import Control.Eff.Fresh
 import Control.Eff.Lift
 import Control.Eff.Reader.Lazy
 import Control.Eff.State.Lazy
+import Control.Eff.Trace
 import Control.Eff.Writer.Lazy
 import Control.Monad (when)
 
@@ -97,6 +98,30 @@ f1 = sequence $ repeat fresh
 -- | Doesn't terminate for `take n f1t` where n > 0.
 f1t :: [Int]
 f1t = run $ runFresh f1 (1 :: Int)
+
+-------------
+--- TRACE ---
+-------------
+-- | Trace and a lifted IO can't be mixed, as both `runTrace` and
+-- `runLift` are meant to be the last effects unwrapped.
+t1 :: Member Trace r => Eff r ()
+t1 = trace "Something happened."
+
+t2 :: Member Trace r => Eff r ()
+t2 = trace "Something else happened."
+
+t3 :: Member Trace r => Eff r ()
+t3 = trace "A third thing happened."
+
+t1t :: IO ()
+t1t = runTrace $ t1 >> t2 >> t3
+
+t2t :: IO (String, ())
+t2t = runTrace $ runWriter (++) "" $ t1 >> tell "Kittens"
+
+-- | As proof of `runTrace` being terminal, the following won't compile.
+--t3t :: (String, IO ())
+--t3t = run $ runWriter (++) "" $ runTrace $ t1 >> tell "Kittens"
 
 -----------------
 --- LIFT (IO) ---
