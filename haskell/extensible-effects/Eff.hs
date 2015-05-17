@@ -128,7 +128,8 @@ t2t = runTrace $ runWriter (++) "" $ t1 >> tell "Kittens"
 -----------------
 -- | Monads don't commute, so there can only be one Lifted Monad per
 -- Effect set.
--- Why does `SetMember` appear here and not in the others above?
+-- `SetMember` appears here because it is the mechanism by which
+-- the lifted effect is guaranteed to be unique.
 l1 :: SetMember Lift (Lift IO) r => Eff r ()
 l1 = lift $ print "時計が壊れた"
 
