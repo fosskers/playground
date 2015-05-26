@@ -19,7 +19,7 @@ import Control.Eff.Reader.Lazy
 import Control.Eff.State.Lazy
 import Control.Eff.Trace
 import Control.Eff.Writer.Lazy
-import Control.Monad (when)
+import Control.Monad (when, join)
 
 --------------
 --- READER ---
@@ -136,6 +136,14 @@ l1 = lift $ print "時計が壊れた"
 -- | Notice we *don't* use `run` here.
 l1t :: IO ()
 l1t = runLift $ l1 >> l1
+
+-- | Mixing lifted IO with other effects which evaluate to IO.
+l2 :: (SetMember Lift (Lift IO) r, Member Trace r) => Eff r ()
+l2 = trace "Will this work?" >> lift (putStrLn "I hope so")
+
+-- | Proof that these can't actually be mixed. Won't compile.
+--l2t :: IO ()
+--l2t = join . runLift $ runTrace l2
 
 -------------------
 --- INTERLEAVED ---
