@@ -1,32 +1,28 @@
+import datetime
+
 from django.db import models
 from django.utils import timezone
 
-import datetime
 
-# --- #
-
-
-# The follow query is an example of Django's `__` field lookup pattern.
-#   Choice.objects.filter(question__q_text__startswith='This')
+# The variable names here become the DB column names.
 class Question(models.Model):
-    q_text = models.CharField('question text', max_length=200)
-    asker = models.CharField(max_length=20, default="colin")
+    question_text = models.CharField(max_length=200)
     pub_date = models.DateTimeField('date published')
 
-    def __unicode__(self):
-        return self.q_text
+    def __str__(self):
+        return self.question_text
 
-    def published_recently(self):
-        now = timezone.now()
-        delta = datetime.timedelta(days=1)
-
-        return now >= self.pub_date >= now - delta
+    def was_published_recently(self):
+        return self.pub_date >= timezone.now() - datetime.timedelta(days=1)
+    was_published_recently.admin_order_field = 'pub_date'
+    was_published_recently.boolean = True
+    was_published_recently.short_description = 'Published recently?'
 
 
 class Choice(models.Model):
     question = models.ForeignKey(Question)
-    c_text = models.CharField(max_length=200)
+    choice_text = models.CharField(max_length=200)
     votes = models.IntegerField(default=0)
 
-    def __unicode__(self):
-        return self.c_text
+    def __str__(self):
+        return self.choice_text

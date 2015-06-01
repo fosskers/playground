@@ -13,29 +13,22 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Choice',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('c_text', models.CharField(max_length=200)),
+                ('id', models.AutoField(primary_key=True, serialize=False, verbose_name='ID', auto_created=True)),
+                ('choice_text', models.CharField(max_length=200)),
                 ('votes', models.IntegerField(default=0)),
             ],
-            options={
-            },
-            bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='Question',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('q_text', models.CharField(max_length=200)),
-                ('pub_date', models.DateTimeField(verbose_name=b'date published')),
+                ('id', models.AutoField(primary_key=True, serialize=False, verbose_name='ID', auto_created=True)),
+                ('question_text', models.CharField(max_length=200)),
+                ('pub_date', models.DateTimeField(verbose_name='date published')),
             ],
-            options={
-            },
-            bases=(models.Model,),
         ),
         migrations.AddField(
             model_name='choice',
             name='question',
             field=models.ForeignKey(to='polls.Question'),
-            preserve_default=True,
         ),
     ]
