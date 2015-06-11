@@ -24,6 +24,7 @@ library
                      , extensible-effects >= 1.9.2.2
                      , hashable >= 1.2.3.1
                      , lens
+                     , linear >= 1.18.1
                      , random
                      , text
                      , unordered-containers
