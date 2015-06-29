@@ -1,4 +1,4 @@
-/* JSoup - 2015 May 19 @ 18:37
+/* JSoup - 2015 June 29 @ 11:07
  * JSoup is a Java library for parsing HTML. With one import to bring
  * in Java container conversion implicits, it's easily usable in Scala.
  */
@@ -11,17 +11,21 @@ import scalaz.syntax.all._
 
 // --- //
 
-case class Response(dest: String, img: String, backup: String)
+case class Response(dest: String, img: String, others: Seq[String])
 
 object JSoup {
   def main(args: Array[String]): Unit = {
-    val html = "<a href=\"http://news.ycombinator.com\">" ++ 
-               "<img src=\"http://i.imgur.com/51VsJTc.jpg\">" ++ 
-               "</a>" ++ 
-               "<img src=\"https://imgur.com/gallery/BDxC4Ol\">"
+    val html = "<a href=\"http://news.ycombinator.com\">" ++
+    "<img src=\"http://i.imgur.com/51VsJTc.jpg\">" ++
+    "</a>" ++
+    "<img src=\"https://imgur.com/gallery/BDxC4Ol\">" ++
+    "<img src=\"https://imgur.com/gallery/BDxC4Ol\">" ++
+    "<img src=\"https://imgur.com/gallery/BDxC4Ol\">"
 
     /* Parse the HTML */
     val doc: Document = Jsoup.parse(html)
+
+    println(s"${doc}")
 
     /* Search for a tag, and only operate on it if it exists.
      * `headOption` and `map` work thanks to JavaConversions.
@@ -35,13 +39,12 @@ object JSoup {
       .headOption
       .map(_.attr("src"))
 
-    /* Select on an attribute whose value matches a regex */
-    lazy val backup: Option[String] = doc.select("img[src~=gallery]")
-      .headOption
+    /* Select with parent/child relationships */
+    lazy val others: Seq[String] = doc.select("body > img")
       .map(_.attr("src"))
 
     /* Consolidate everything via Applicative */
-    val r: Option[Response] = (dest |@| img |@| backup) { Response(_,_,_) }
+    val r: Option[Response] = (dest |@| img) { Response(_,_,others) }
 
     println(r)
   }
