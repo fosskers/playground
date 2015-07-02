@@ -25,6 +25,7 @@ library
                      , hashable >= 1.2.3.1
                      , lens
                      , linear >= 1.18.1
+                     , mongoDB >= 2.0.4
                      , random
                      , text
                      , unordered-containers
