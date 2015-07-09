@@ -51,13 +51,13 @@ decagon xoff = map g . f $ points xoff
 band :: [Vertex] -> [Vertex] -> [Vertex]
 band [_] [_] = []
 band (a:b:cs) (x:y:zs) = vs ++ band (b:cs) (y:zs)
-  where normal = normalize $ cross (_loc x ^-^ _loc a) (_loc b ^-^ _loc a)
+  where normal = normalize $ cross (_loc b ^-^ _loc a) (_loc x ^-^ _loc a)
         vs     = [a,b,x,x,y,b] & traverse . nor .~ normal
 
 -- | All the vertices of a decagonal prism.
 prism :: [Vertex]
 prism = take 30 d1 ++ take 30 d2 ++ take 60 (band (f d1) (f d2))
-  where d1 = decagon 0.25
-        d2 = decagon (-0.25)
+  where d1 = decagon 0.125
+        d2 = decagon (-0.125)
         f [] = []
         f xs = head xs : f (drop 3 xs)
