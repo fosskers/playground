@@ -3,37 +3,44 @@
 
 module Mongo where
 
+import Control.Monad.IO.Class (liftIO)
+import Data.Time.Clock
 import Database.MongoDB
 
 ---
 
 {-| Some cats -}
-jack :: Document
-jack = [ "name"   =: "Jack"
-       , "gender" =: "雄"  -- Some UTF8
-       , "age"    =: 2
-       , "food"   =: "hard"
-       , "hobby"  =: "Waking me up at 5 a.m." ]
+jack :: UTCTime -> Document
+jack t = [ "name"   =: "Jack"
+         , "gender" =: "雄"  -- Some UTF8
+         , "age"    =: 2
+         , "food"   =: "hard"
+         , "hobby"  =: "Waking me up at 5 a.m."
+         , "added"  =: t ]
 
-miso :: Document
-miso = [ "name"   =: "Miso"
-       , "gender" =: "雌"
-       , "age"    =: 8
-       , "food"   =: "hard"
-       , "hobby"  =: "Shedding" ]
-
-tinsel :: Document
-tinsel = [ "name"   =: "Tinsel"
+miso :: UTCTime -> Document
+miso t = [ "name"   =: "Miso"
          , "gender" =: "雌"
-         , "age"    =: 12
-         , "food"   =: "soft"
-         , "hobby"  =: "Sleeping" ]
+         , "age"    =: 8
+         , "food"   =: "hard"
+         , "hobby"  =: "Shedding"
+         , "added"  =: t ]
+
+tinsel :: UTCTime -> Document
+tinsel t = [ "name"   =: "Tinsel"
+           , "gender" =: "雌"
+           , "age"    =: 12
+           , "food"   =: "soft"
+           , "hobby"  =: "Sleeping"
+           , "added"  =: t ]
 
 {-| Creates a pipe and runs some read/write Action. -}
 mongo :: Action IO a -> IO a
 mongo act = do
   pipe <- connect $ host "127.0.0.1"
-  access pipe master "playground" act
+  r <- access pipe master "playground" act
+  close pipe
+  return r
 
 write :: Document -> Action IO Value
 write d = insert "cats" d
@@ -47,7 +54,9 @@ fetch1 :: Action IO Document
 fetch1 = fetch $ select ["name" =: "Sam"] "cats"
 
 writeMany :: Action IO [Value]
-writeMany = insertMany "cats" [jack,miso,tinsel]
+writeMany = do
+  t <- liftIO getCurrentTime
+  insertMany "cats" [jack t, miso t, tinsel t]
 
 readMany :: Action IO [Document]
 readMany = find (select ["food" =: "hard"] "cats") >>= rest
@@ -61,3 +70,4 @@ proj = find (select [] "cats") {project = ["name" =: 1, "_id" =: 0]} >>= rest
 {- | Kill all the cats -}
 bye :: Action IO ()
 bye = delete $ select [] "cats"
+
