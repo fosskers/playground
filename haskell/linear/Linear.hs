@@ -1,6 +1,7 @@
 module Linear where
 
 import Control.Lens
+import Data.Monoid
 import Linear.Matrix
 import Linear.V3
 import Linear.Vector
@@ -35,6 +36,10 @@ sums = sumV [x,y,z] == sum [x,y,z]
 -- | Vector types are foldable.
 sums2 :: Int
 sums2 = sum $ sum [x,y,z]
+
+-- | Lenses are hip. Vector types are traversable.
+sums3 :: Sum Int
+sums3 = [x,y,z] ^. traverse . traverse . to Sum
 
 ------------
 --- MATRICES
