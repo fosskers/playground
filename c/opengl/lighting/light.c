@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <GL/glew.h>  // This must be before other GL libs.
 #include <GLFW/glfw3.h>
-#include <SOIL/SOIL.h>
 #include <math.h>
 
 #include "cog/camera/camera.h"
@@ -266,7 +265,7 @@ int main(int argc, char** argv) {
                 // Update light position
                 coglMDestroy(lightPos);
                 lightAngle += tau/256;
-                lightPos = coglV3(2*cos(lightAngle),1.0f,2*sin(lightAngle));
+                lightPos = coglV3(cos(lightAngle),1.0f,sin(lightAngle));
 
                 // Set colours
                 GLuint cubeL  = glGetUniformLocation(cShaderP,"cubeColour");
