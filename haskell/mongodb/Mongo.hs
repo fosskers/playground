@@ -61,6 +61,13 @@ writeMany = do
 readMany :: Action IO [Document]
 readMany = find (select ["food" =: "hard"] "cats") >>= rest
 
+-- | Updating
+update :: Action IO ()
+update = read1 >>= f
+  where f Nothing  = return ()
+        f (Just c) = save "cats" $ merge ["hobby" =: "Sleeping"] c
+
+-- | Counting
 howManyCats :: Action IO Int
 howManyCats = count $ select [] "cats"
 
