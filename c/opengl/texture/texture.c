@@ -5,9 +5,9 @@
 #include <SOIL/SOIL.h>
 #include <math.h>
 
-#include "ogll/opengl-linalg.h"
-#include "ogls/opengl-shaders.h"
-#include "ogls/dbg.h"
+#include "cog/linalg/linalg.h"
+#include "cog/shaders/shaders.h"
+#include "cog/dbg.h"
 
 // --- //
 
@@ -55,9 +55,9 @@ int main(int argc, char** argv) {
 
         // Create Shader Program
         log_info("Making shader program.");
-        shaders_t* shaders = oglsShaders("vertex.glsl", "fragment.glsl");
-        GLuint shaderProgram = oglsProgram(shaders);
-        oglsDestroy(shaders);
+        shaders_t* shaders = cogsShaders("vertex.glsl", "fragment.glsl");
+        GLuint shaderProgram = cogsProgram(shaders);
+        cogsDestroy(shaders);
 
         check(shaderProgram > 0, "Shaders didn't compile.");
         log_info("Shaders good.");
@@ -133,14 +133,9 @@ int main(int argc, char** argv) {
 
         log_info("Face texture created.");
 
-        // Draw in Wireframe mode
-        //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
         // Applying transformations
-        t = ogllMIdentity(4);
-        ogllMScale(t,0.5);
-        //        ogllM4TranslateInPlace(t,0.5f,-0.5f,0.0f);
-        GLfloat rot = 0.05f;
+        t = coglMIdentity(4);
+        coglMScale(t,0.5);
 
         // Render until you shouldn't.
         while(!glfwWindowShouldClose(w)) {
@@ -159,12 +154,10 @@ int main(int argc, char** argv) {
                 glBindTexture(GL_TEXTURE_2D, face_tex);
                 glUniform1i(glGetUniformLocation(shaderProgram,"tex2"),1);
 
-                GLuint transformLoc = glGetUniformLocation(shaderProgram,"transform");
-                //                rot = (float)glfwGetTime() / 10.0;
-                //                ogllMScale(t,scl);
-                t = ogllM4RotateInPlace(t,rot);
+                GLuint modLoc = glGetUniformLocation(shaderProgram,"model");
+                t = coglM4Rotate(t,tau/512,0,0,1);
                 check(t, "Rotation failed.");
-                glUniformMatrix4fv(transformLoc,1,GL_FALSE,t->m);
+                glUniformMatrix4fv(modLoc,1,GL_FALSE,t->m);
                 
                 glBindVertexArray(VAO);
                 glDrawElements(GL_TRIANGLES,6,GL_UNSIGNED_INT,0);
@@ -176,12 +169,12 @@ int main(int argc, char** argv) {
 
         // Clean up.
         glfwTerminate();
-        ogllMDestroy(t);
+        coglMDestroy(t);
 
         log_info("And done.");
 
         return EXIT_SUCCESS;
  error:
-        if(t) { ogllMDestroy(t); }
+        if(t) { coglMDestroy(t); }
         return EXIT_FAILURE;
 }
