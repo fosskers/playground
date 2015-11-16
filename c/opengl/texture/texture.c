@@ -116,7 +116,7 @@ int main(int argc, char** argv) {
 
         // Face texture
         GLuint face_tex;
-        img = SOIL_load_image("awesomeface.png",
+        img = SOIL_load_image("score-square.png",//"awesomeface.png",
                               &width,&height,0,SOIL_LOAD_RGB);
         check(img, "Face image didn't load.");
         glGenTextures(1,&face_tex);
@@ -155,8 +155,8 @@ int main(int argc, char** argv) {
                 glUniform1i(glGetUniformLocation(shaderProgram,"tex2"),1);
 
                 GLuint modLoc = glGetUniformLocation(shaderProgram,"model");
-                t = coglM4Rotate(t,tau/512,0,0,1);
-                check(t, "Rotation failed.");
+                //                t = coglM4Rotate(t,tau/512,0,0,1);
+                //                check(t, "Rotation failed.");
                 glUniformMatrix4fv(modLoc,1,GL_FALSE,t->m);
                 
                 glBindVertexArray(VAO);

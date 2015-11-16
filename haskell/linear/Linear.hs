@@ -25,7 +25,7 @@ y = unit _y
 z :: V3 Int
 z = cross x y
 
--- | We get bases for free by contraining the return type.
+-- | We get bases for free by constraining the return type.
 basis' :: [V3 Int]
 basis' = basis
 
