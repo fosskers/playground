@@ -21,7 +21,7 @@ class Application extends Controller {
   /* Spark Context */
   val conf = new SparkConf()
     .setAppName("Spark with Play")
-    .setMaster("local[2]")
+    .setMaster("local[2]")  // Use two local cores
   val sc = new SparkContext(conf)
 
   /* Create an RDD, and mark it for caching */
