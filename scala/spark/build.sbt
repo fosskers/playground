@@ -10,7 +10,8 @@ libraryDependencies ++= Seq(
   jdbc,
   cache,
   ws,
-  "org.apache.spark" %% "spark-core" % "1.6.0"
+  "org.apache.spark" %% "spark-core" % "1.6.0",
+  "org.apache.spark" %% "spark-mllib" % "1.6.0"
 )
 
 // This fixes an injection execption that occurs due to differing
