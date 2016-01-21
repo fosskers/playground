@@ -14,7 +14,7 @@ import org.apache.spark.mllib.recommendation.{ALS, Rating}
 class Collab @Inject() (spark: Spark) {
 
   /* Load and parse the data */
-  val data = spark.sc.textFile(spark.sparkHome ++ "data/mllib/als/test.data")
+  val data = spark.sc.textFile("data.txt")
   val ratings = data.map(_.split(',') match { case Array(user, item, rate) =>
     Rating(user.toInt, item.toInt, rate.toDouble)
   })
