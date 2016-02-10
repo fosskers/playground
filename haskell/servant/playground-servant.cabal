@@ -16,6 +16,7 @@ cabal-version:       >=1.10
 
 library
   exposed-modules:     Server
+                     , ExtensibleEffects
                      , SimpleExample
   -- other-modules:       
   -- other-extensions:    
@@ -27,6 +28,7 @@ library
                      , blaze-markup >= 0.7.0.3
                      , bytestring >= 0.10.6.0
                      , directory >= 1.2.2.0
+                     , extensible-effects >= 1.11.0.3
                      , http-media >= 0.6.2
                      , lucid >= 2.9.4
                      , servant >= 0.4.4.6
