@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds #-}
+{-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE FlexibleContexts #-}
 
@@ -19,7 +19,8 @@ import Control.Eff.Reader.Lazy
 import Control.Eff.State.Lazy
 import Control.Eff.Trace
 import Control.Eff.Writer.Lazy
-import Control.Monad (when, join)
+import Control.Monad (when)
+import Data.Void
 
 --------------
 --- READER ---
@@ -148,15 +149,15 @@ l2 = trace "Will this work?" >> lift (putStrLn "I hope so")
 -------------------
 --- INTERLEAVED ---
 -------------------
--- | This is thanks to the ConstraintKinds extension.
-type Effects r = ( Member (Writer String) r
-                 , Member (State [Dilithium]) r
-                 , Member (Exc String) r )
+-- | Our effect stack, explicitely defined with no existential `r`.
+-- Note: This constrains the unwrapping order.
+type Effects = Eff (Exc String :> Writer String :> State [Dilithium] :> Lift IO :> Void)
 
 data Dilithium = Dilithium
 
 -- | Why can't the type of the State value be inferred?
 engage :: (Member (State [Dilithium]) r, Member (Exc String) r) => Eff r ()
+--engage :: Eff (Exc String :> State [Dilithium] :> r) ()  -- Doesn't like.
 engage = get >>= \(ds :: [Dilithium]) -> do
   if length ds < 5
      then throwExc "We're short on Dilithium, Cap'n!"
@@ -171,7 +172,7 @@ captLog s = tell $ "Captain's Log: " ++ s
 fire :: IO ()
 fire = print "Kaboom!"
 
-voyage :: (Effects r, SetMember Lift (Lift IO) r) => Eff r ()
+voyage :: Effects ()
 voyage = do
   captLog "Time for a cosmic adventure!"
   captLog "Need to fill the tanks."
@@ -183,5 +184,5 @@ voyage = do
   lift fire
 
 vt :: IO (String, Either String ())
-vt = runLift $ evalState ([] :: [Dilithium]) $ runWriter f "" $ runExc voyage
+vt = runLift $ evalState [] $ runWriter f "" $ runExc voyage
   where f acc s = acc ++ "\n" ++ s
