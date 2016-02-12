@@ -28,6 +28,7 @@ library
                      , blaze-markup >= 0.7.0.3
                      , bytestring >= 0.10.6.0
                      , directory >= 1.2.2.0
+                     , either >= 4.4.1
                      , extensible-effects >= 1.11.0.3
                      , http-media >= 0.6.2
                      , lucid >= 2.9.4
@@ -36,6 +37,7 @@ library
                      , string-conversions >= 0.4
                      , text >= 1.2.2.0
                      , time >= 1.5.0.1
+                     , transformers >= 0.4.2.0
                      , wai >= 3.2.0
                      , warp >= 3.2.2
   -- hs-source-dirs:      
