@@ -19,12 +19,19 @@ import           Servant
 
 ---
 
+-- | A nice alias for our combined effect set. Since we know every
+-- effect present in the final set, we can write it explicitely like this
+-- to avoid the usual `r` variable. `r` complicates the Natural Transformation
+-- we define below.
 type Effect = Eff (Exc String E.:> Lift IO E.:> Void)
 
+-- | The meat of our Natural Transformation between our Effect set
+-- and the default `EitherT ServantErr IO` that servant uses.
 effToEither' :: Effect a -> EitherT ServantErr IO a
 effToEither' eff = liftIO (runLift $ runExc eff) >>= f
   where f = either (\e -> left err404 { errReasonPhrase = e }) right
 
+-- | The Natural Transformation
 effToEither :: Effect :~> EitherT ServantErr IO
 effToEither = Nat effToEither'
 
