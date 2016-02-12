@@ -15,6 +15,7 @@ class Spark {
   val conf = new SparkConf()
     .setAppName("Spark with Play")
     .setMaster("local[2]") // Use two local cores
+    .set("spark.executor.memory", "1g")
 
   val sc = new SparkContext(conf)
 }

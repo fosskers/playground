@@ -22,6 +22,5 @@ class Collab @Inject() (spark: Spark) {
   /* Build the recommendation model using ALS */
   val rank = 10
   val numIterations = 10
-  val model = ALS.train(ratings, rank, numIterations, 0.01)
-
+  lazy val model = ALS.train(ratings, rank, numIterations, 0.01)
 }

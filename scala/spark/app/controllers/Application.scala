@@ -8,11 +8,13 @@ import javax.inject._
 import org.apache.spark.SparkContext._
 import org.apache.spark.mllib.recommendation.Rating
 import play.api._
+import play.api.libs.json.Json
 import play.api.mvc._
+import scala.util.{Failure, Success, Try}
 
 // --- //
 
-class Application @Inject() (t: Text, c: Collab) extends Controller {
+class Application @Inject() (t: Text, c: Collab, w: W2V) extends Controller {
 
   def index = Action {
     val numAs = t.logData.filter(line => line.contains("a")).count()
@@ -41,5 +43,15 @@ class Application @Inject() (t: Text, c: Collab) extends Controller {
     }.mean()
 
     Ok(s"Mean Squared Error = ${MSE}")
+  }
+
+  /* Find words thematically related to the input */
+  def word2vec(word: String) = Action {
+    Try {
+      w.model.findSynonyms(word, 20).map({ case (w,r) => s"$w => $r" })
+    } match {
+      case Success(s) => Ok(Json.toJson(s))
+      case Failure(_) => Ok(Json.obj("error" -> s"${word} wasn't found."))
+    }
   }
 }
