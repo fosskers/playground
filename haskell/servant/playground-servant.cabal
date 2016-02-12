@@ -32,6 +32,7 @@ library
                      , extensible-effects >= 1.11.0.3
                      , http-media >= 0.6.2
                      , lucid >= 2.9.4
+                     , microlens >= 0.4
                      , servant >= 0.4.4.6
                      , servant-server >= 0.4.4.6
                      , string-conversions >= 0.4
