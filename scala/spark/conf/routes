@@ -6,6 +6,7 @@
 GET     /                           controllers.Application.index
 GET     /collab                     controllers.Application.collab
 GET     /w2v                        controllers.Application.word2vec(word: String)
+GET     /assoc                      controllers.Application.assoc(w1: String, w2: String, w3: String)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)

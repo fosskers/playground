@@ -6,11 +6,13 @@ package controllers
 
 import javax.inject._
 import org.apache.spark.SparkContext._
+import org.apache.spark.mllib.linalg.DenseVector
 import org.apache.spark.mllib.recommendation.Rating
 import play.api._
 import play.api.libs.json.Json
 import play.api.mvc._
 import scala.util.{Failure, Success, Try}
+import types.Vectors._
 
 // --- //
 
@@ -52,6 +54,20 @@ class Application @Inject() (t: Text, c: Collab, w: W2V) extends Controller {
     } match {
       case Success(s) => Ok(Json.toJson(s))
       case Failure(_) => Ok(Json.obj("error" -> s"${word} wasn't found."))
+    }
+  }
+
+  def assoc(w1: String, w2: String, w3: String) = Action {
+    Try {
+      val v1: DenseVector = w.model.transform(w1).toDense
+      val v2: DenseVector = w.model.transform(w2).toDense
+      val v3: DenseVector = w.model.transform(w3).toDense
+
+      w.model.findSynonyms(v1 |-| v2 |+| v3, 20)
+        .map({ case (w,r) => s"$w => $r" })
+    } match {
+      case Success(s) => Ok(Json.toJson(s))
+      case Failure(_) => Ok(Json.obj("error" -> "One of the words couldn't be found."))
     }
   }
 }
