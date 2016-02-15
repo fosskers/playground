@@ -1,6 +1,6 @@
 module Linear where
 
-import Control.Lens
+import Lens.Micro
 import Data.Monoid
 import Linear.Matrix
 import Linear.V3
@@ -58,5 +58,5 @@ mult = v1 !*! v2
         v2 = V3 (V3 1 2 8) (V3 3 4 9) (V3 4 5 0)
 
 -- | Comes with inverse functions for up to 4x4 matrices.
-inv :: Maybe (M33 Float)
+inv :: M33 Float
 inv = inv33 mult

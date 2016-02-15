@@ -1,0 +1,16 @@
+name:                pg-linear
+version:             1.0.0
+author:              Colin Woodbury
+maintainer:          colingw@gmail.com
+build-type:          Simple
+cabal-version:       >=1.10
+
+library
+  exposed-modules:     Linear
+  -- other-modules:       
+  -- other-extensions:    
+  build-depends:       base >=4.8 && <4.9
+                     , microlens < 0.5
+                     , linear < 2
+  -- hs-source-dirs:      
+  default-language:    Haskell2010
