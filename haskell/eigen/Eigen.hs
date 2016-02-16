@@ -1,3 +1,17 @@
+{-|
+
+`eigen` is a Haskell wrapper for the C++ Linear Algebra library `Eigen`.
+
+PROs:
+* Supports arbitrarily sized Matrices of different number types
+* Has convenient matrix manipulation functions
+
+CONs:
+* Supports parallel computation, but through OpenMP, not native Haskell
+* Throws exceptions when indices are out of bounds
+
+-}
+
 module Eigen where
 
 import           Data.Eigen.LA
