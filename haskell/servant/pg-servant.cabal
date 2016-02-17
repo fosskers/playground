@@ -32,11 +32,13 @@ library
                      , either >= 4.4.1
                      , extensible-effects >= 1.11.0.3
                      , http-media >= 0.6.2
+                     , http-types >= 0.9
                      , lucid >= 2.9.4
                      , microlens >= 0.4
                      , servant < 5
-                     , servant-server < 0.5
                      , servant-client < 0.5
+                     , servant-docs < 5
+                     , servant-server < 0.5
                      , string-conversions >= 0.4
                      , text >= 1.2.2.0
                      , time >= 1.5.0.1
