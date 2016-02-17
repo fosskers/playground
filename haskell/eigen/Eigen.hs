@@ -9,7 +9,7 @@ PROs:
 CONs:
 * Supports parallel computation, but through OpenMP, not native Haskell
 * Throws exceptions when indices are out of bounds
-
+* Isn't very compatible with the rest of the Haskell ecosystem
 -}
 
 module Eigen where
