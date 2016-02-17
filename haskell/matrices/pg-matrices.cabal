@@ -1,0 +1,19 @@
+name:                pg-matrices
+version:             1.0.0
+author:              Colin Woodbury
+maintainer:          colingw@gmail.com
+-- copyright:           
+-- category:            
+build-type:          Simple
+-- extra-source-files:  
+cabal-version:       >=1.10
+
+library
+  exposed-modules:     Matrices
+  -- other-modules:       
+  -- other-extensions:    
+  build-depends:       base >=4.8 && <4.9
+                     , matrices < 0.5
+                     , vector < 0.12
+  -- hs-source-dirs:      
+  default-language:    Haskell2010
