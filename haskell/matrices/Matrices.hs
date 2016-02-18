@@ -7,7 +7,7 @@ The basic type is an immutable `Matrix a`. Format (`show` output):
     Matrix i j n m [1,2,3...]
       i => Rows
       j => Columns
-      n => ???
+      n => Number of columns in the parent Vector
       m => Starting index of this Matrix within the parent Vector
 
 PROs:
@@ -18,7 +18,7 @@ PROs:
 
 CONs:
 * Needs minor type hand-holding
-* Throws exceptions
+* Throws exceptions, no safe indexing
 * No pretty-printing / Unclear `Show` output
 
 -}
@@ -34,7 +34,7 @@ l0 :: [[Int]]
 l0 = [[1,2,3],[4,5,6],[7,8,9]]
 
 v1 :: Vector Int
-v1 = fromList [1..16]
+v1 = fromList [1..64]
 
 v2 :: Vector Char
 v2 = fromList ['a'..'d']
@@ -47,11 +47,11 @@ m1 = ident 5
 
 -- | From a given Vector, make a (Row,Column) size Matrix.
 m2 :: Matrix Int
-m2 = fromVector (4,4) v1
+m2 = fromVector (8,8) v1
 
 -- | Non-square
 m3 :: Matrix Int
-m3 = fromVector (2,3) v1
+m3 = fromVector (4,16) v1
 
 -- | Back to a Vector
 v3 :: Vector Int
@@ -59,6 +59,6 @@ v3 = flatten m0
 
 -- | Getting sub-matrices. Original matrix is retained internally.
 -- Is it just a copied pointer or something? Using `flatten` gives
--- the reduced `Vector`.
+-- the proper reduced `Vector`.
 m4 :: Matrix Int
 m4 = subMatrix (1,1) (2,2) m2
