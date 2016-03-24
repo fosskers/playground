@@ -61,4 +61,4 @@ v3 = flatten m0
 -- Is it just a copied pointer or something? Using `flatten` gives
 -- the proper reduced `Vector`.
 m4 :: Matrix Int
-m4 = subMatrix (1,1) (2,2) m2
+m4 = subMatrix (3,3) (5,5) m2
