@@ -29,16 +29,11 @@ object Equil {
 
   /** One-iteration */
   def oneIter(xs: Array[Int]): Option[Int] = {
-    def work(lIx: Int, rIx: Int, leftSum: Int, rightSum: Int): Option[Int] = {
-      if(lIx > rIx) {
-        None
-      } else if(lIx == rIx && leftSum == rightSum) {
-        Some(lIx)
-      } else if(leftSum < rightSum) {
-        work(lIx + 1, rIx, leftSum + xs(lIx + 1), rightSum)
-      } else {
-        work(lIx, rIx - 1, leftSum, rightSum + xs(rIx - 1))
-      }
+    def work(lIx: Int, rIx: Int, leftSum: Int, rightSum: Int): Option[Int] = xs match {
+      case _ if lIx > rIx => None
+      case _ if lIx == rIx && leftSum == rightSum => Some(lIx)
+      case _ if leftSum < rightSum => work(lIx + 1, rIx, leftSum + xs(lIx + 1), rightSum)
+      case _ => work(lIx, rIx - 1, leftSum, rightSum + xs(rIx - 1))
     }
 
     xs match {
