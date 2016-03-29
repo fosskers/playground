@@ -27,18 +27,30 @@ object Equil {
     })._2
   }
 
-  /** One-iteration */
+  /** One-iteration
+    * Naively tries to minimize the distance between each sum at each
+    * step.
+    */
   def oneIter(xs: Array[Int]): Option[Int] = {
-    def work(lIx: Int, rIx: Int, leftSum: Int, rightSum: Int): Option[Int] = xs match {
-      case _ if lIx > rIx => None
-      case _ if lIx == rIx && leftSum == rightSum => Some(lIx)
-      case _ if leftSum < rightSum => work(lIx + 1, rIx, leftSum + xs(lIx + 1), rightSum)
-      case _ => work(lIx, rIx - 1, leftSum, rightSum + xs(rIx - 1))
+    def go(lIx: Int, rIx: Int, lSum: Int, rSum: Int): Option[Int] = xs match {
+      case _ if lIx == rIx && lSum == rSum => Some(lIx)
+      case _ if lIx >= rIx => None
+      case _ => {
+        val nextLSum = lSum + xs(lIx + 1)
+        val nextRSum = rSum + xs(rIx - 1)
+
+        /* Recurse on whichever side minimizes the sum difference */
+        if((nextLSum - rSum).abs < (lSum - nextRSum).abs) {
+          go(lIx + 1, rIx, nextLSum, rSum)
+        } else {
+          go(lIx, rIx - 1, lSum, nextRSum)
+        }
+      }
     }
 
     xs match {
       case Array() => None
-      case _ => work(0, xs.length - 1, xs(0), xs(xs.length - 1))
+      case _ => go(0, xs.length - 1, xs(0), xs(xs.length - 1))
     }
   }
 }
