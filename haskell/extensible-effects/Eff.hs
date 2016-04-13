@@ -186,3 +186,59 @@ voyage = do
 vt :: IO (String, Either String ())
 vt = runLift $ evalState [] $ runWriter f "" $ runExc voyage
   where f acc s = acc ++ "\n" ++ s
+
+--------------------------
+-- MULTIPLE `State Int` --
+--------------------------
+msi0 :: Member (State Int) r => Eff r ()
+msi0 = modify (\(n :: Int) -> n + 1)
+
+msi1 :: Member (State Int) r => Eff r ()
+msi1 = modify (\(n :: Int) -> n * 2)
+
+-- | "Open" effect set
+msi2 :: Member (State Int) r => Eff r ()
+msi2 = msi0 >> msi1
+
+-- | "Closed" effect set
+msi3 :: Eff (State Int :> Void) ()
+msi3 = msi0 >> msi1
+
+-- | This works, but only the first State (10) is affected.
+-- It seems like multiple effects of the same type are being subtracted
+-- from the Union. Feels wrong.
+--
+-- The expanded type of `msi2` is assumed to be:
+--   Eff (State Int :> State Int :> State Int :> Void) ()
+--
+-- As a convention, it might be healthy to have one's "entry"
+-- function into `Eff` (msi2 here) have a concrete effect set a la:
+--   Eff (State Int :> ... :> Void) a
+-- while having the rest of your function work with the existential `r`.
+unwrap0 :: (Int, (Int, (Int, ())))
+unwrap0 = run $ runState 67 $ runState 1 $ runState 10 msi2
+
+-- Doesn't compile, as expected. Can't subtract more effects from
+-- the set than you've explicity claimed.
+--unwrap1 :: (Int, (Int, (Int, ())))
+--unwrap1 = run $ runState 67 $ runState 1 $ runState 10 msi3
+
+query :: Eff (Reader Int :> Void) Int
+query = ask
+
+-- Doesn't compile. Can't force generality back out of a constrained set.
+--foo :: (Member (State Int) r, Member (Reader Int) r) => Eff r Int
+--foo = msi3 >> query
+
+-- Same thing, even though `msi2` is general.
+--foo :: (Member (State Int) r, Member (Reader Int) r) => Eff r Int
+--foo = msi2 >> query
+
+-- Works as expected.
+foo :: (Member (State Int) r, Member (Reader Int) r) => Eff r Int
+foo = msi2 >> ask
+
+-- Doesn't compile, since both `State` and `Reader` claim to be the
+-- last effects in the set.
+--unwrap2 :: (Int, Int)
+--unwrap2 = run $ runState 10 $ runReader (msi3 >> query) 1
