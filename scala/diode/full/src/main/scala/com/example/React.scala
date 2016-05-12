@@ -23,7 +23,7 @@ case class LogIt(msg: String)
 case object Logged
 
 object ReactCircuit extends Circuit[DBRoot] with ReactConnector[DBRoot] {
-  override def initialModel = DBRoot(MsgDB(Seq("Hi Nathan"), 0))
+  override def initialModel = DBRoot(MsgDB(Seq(), 0))
 
   // Boilerplate :(
   val dbL: ModelRW[DBRoot, MsgDB] = zoomRW(_.db)((m, v) => m.copy(db = v))
@@ -46,11 +46,8 @@ object ReactCircuit extends Circuit[DBRoot] with ReactConnector[DBRoot] {
 
   val logH = new ActionHandler(lsL) {
     override def handle = {
-      case LogIt(m) => effectOnly(logIt(m) >> logIt(m :+ '!'))
-      case Logged => {
-        println(value)
-        updated(value + 1)
-      }
+      case LogIt(m) => effectOnly(logIt(m))
+      case Logged => updated(value + 1)
     }
   }
 
