@@ -25,5 +25,8 @@ library
                      , pipes-bytestring >= 2.1 && < 2.2
                      , bytestring
                      , aeson >= 0.11 && < 0.12
+                     , microlens >= 0.4 && < 0.5
+                     , microlens-mtl >= 0.1.7 && < 0.2
+                     , microlens-aeson >= 2.1 && < 3
   -- hs-source-dirs:
   default-language:    Haskell2010
