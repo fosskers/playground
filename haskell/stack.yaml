@@ -11,12 +11,16 @@ packages:
   - matrices/
   - microlens/
   - ghc8/
+  - pipes/
   #  - servant/
 
 # Packages to be pulled from upstream that are not in the resolver (e.g., acme-missiles-0.3)
 extra-deps:
   - random-eff-0.1.0.1
   - eigen-2.1.6
+  - pipes-aeson-0.4.1.6
+  - pipes-bytestring-2.1.2
+  - pipes-group-1.0.4
 
 # Override default flag values for local packages and extra-deps
 flags: {}
