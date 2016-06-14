@@ -13,6 +13,7 @@ packages:
   - ghc8/
   - pipes/
   - json-stream/
+  - discrimination/
   #  - servant/
 
 # Packages to be pulled from upstream that are not in the resolver (e.g., acme-missiles-0.3)
@@ -23,6 +24,8 @@ extra-deps:
   - pipes-bytestring-2.1.2
   - pipes-group-1.0.4
   - json-stream-0.4.1.0
+  - discrimination-0.2.1
+  - promises-0.3
 
 # Override default flag values for local packages and extra-deps
 flags: {}
