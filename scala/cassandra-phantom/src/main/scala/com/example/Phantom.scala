@@ -1,7 +1,8 @@
 package com.example
 
 import com.websudos.phantom.dsl._
-import scala.concurrent.Future
+import scala.concurrent.{ Await, Future }
+import scala.concurrent.duration._
 
 // --- //
 
@@ -84,7 +85,7 @@ object Phantom extends Defaults.connector.Connector {
       Language("Fortran", new DateTime(1956, 10, 15, 6, 0), true)
     )
 
-    for {
+    val fut: Future[Unit] = for {
       _ <- DB.createAsync
       _ <- Future.sequence(langs.map(l => DB.languages.store(l)))
       _ <- Future.sequence(langs.map(l => DB.languages.store(l)))
@@ -93,6 +94,10 @@ object Phantom extends Defaults.connector.Connector {
     } yield {
       println(r)
     }
+
+    Await.result(fut, 10.seconds)
+
+    DB.shutdown()
 
     println("[PG] Done")
   }
