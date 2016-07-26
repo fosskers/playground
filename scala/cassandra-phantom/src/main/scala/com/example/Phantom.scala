@@ -85,7 +85,7 @@ object Phantom extends Defaults.connector.Connector {
     )
 
     for {
-      _ <- DB.autocreate.future()
+      _ <- DB.createAsync
       _ <- Future.sequence(langs.map(l => DB.languages.store(l)))
       _ <- Future.sequence(langs.map(l => DB.languages.store(l)))
       r <- DB.languages.getByName("Haskell")
