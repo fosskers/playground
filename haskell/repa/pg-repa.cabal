@@ -26,4 +26,4 @@ executable pg-repa
   -- hs-source-dirs:
   default-language:    Haskell2010
 
-  ghc-options: -Odph -rtsopts -threaded -optlo-O3
+  ghc-options: -Odph -rtsopts -threaded -optlo-O3 -fwarn-unused-imports
