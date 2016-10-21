@@ -1,5 +1,6 @@
 module XML where
 
+import           Data.Graph
 import qualified Data.Text as T
 import qualified Data.Text.IO as TIO
 import           Data.Tree
@@ -37,11 +38,50 @@ memberRefs = foldr f [] . elContent
         g (Attr (QName { qName = "ref" }) _) = True
         g _ = False
 
-relTree :: T.Text -> [(String, [String])]
-relTree t = zip bsIds $ map (\b -> filter (`elem` bsIds) $ memberRefs b) bs
-  where bs = filter isBoundary $ relations t
+relTree :: T.Text -> Forest String
+relTree t = map (fmap (first . key)) $ dfs g (topSort g)
+  where (g, key, _) = graphFromEdges trips
+        trips = map f . zip bsIds $ map (\b -> filter (`elem` bsIds) $ memberRefs b) bs
+        f (k, keys) = (k, k, keys)
+        bs = filter isBoundary $ relations t
         bsIds = map iden bs
 
 tree :: Tree Int
 tree = Node 52411 $ Node 53136 rest : rest
   where rest = [Node 53134 [Node 53114 [Node 2524404 [Node 53137 []]]]]
+
+fpath :: FilePath
+fpath = "/home/colin/code/playground/haskell/xml/baarle-nassau.osm"
+
+first :: (a,b,c) -> a
+first (a,_,_) = a
+
+foo :: Tree String
+foo = head . map (fmap (show . first . key)) $ dfs g (topSort g)
+  where (g, key, _) = graphFromEdges [ (1, 1, [2,3])
+                                     , (2, 2, [4])
+                                     , (3, 3, [4])
+                                     , (4, 4, [5, 6])
+                                     , (5, 5, [7,2])
+                                     , (6, 6, [7])
+                                     , (7, 7, [])
+                                     ]
+
+{-
+
+("297220",[])
+("47798",[])
+("53137",[])
+("2718258",[])
+("2718379",[])
+("3363871",[])
+("47796",[])
+("52411",["53134","53136"])
+("2524404",["53137"])
+("53114",["2524404"])
+("47696",[])
+("2323309",["47796"])
+("53136",["53134"])
+("53134",["53114"])
+
+-}
