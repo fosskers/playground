@@ -9,10 +9,25 @@ import           Text.XML.Light.Types
 
 ---
 
+{- | NOTES - What is this for?
 
+This breaks apart potentially cyclic graphs into topologically sorted
+spanning trees. In the context of OSM, this allows us to break apart illegal
+Relation graphs.
+
+The key algorithm is:
+
+g :: Graph
+
+(dfs g $ topSort g) :: Forest Vertex
+
+-}
+
+-- | Read some XML file.
 osm :: FilePath -> IO T.Text
 osm fp = T.unlines . drop 138218 . T.lines <$> TIO.readFile fp
 
+-- | Parse and filter OSM Relations.
 relations :: T.Text -> [Element]
 relations = foldr f [] . parseXML
   where f (Elem e@(Element { elName = QName { qName = "relation" }})) acc = e : acc
@@ -31,6 +46,7 @@ iden = attrVal . head . filter g . elAttribs
   where g (Attr (QName { qName = "id"}) _) = True
         g _ = False
 
+-- | All ID references to other Elements.
 memberRefs :: Element -> [String]
 memberRefs = foldr f [] . elContent
   where f (Elem e@(Element { elName = QName { qName = "member" }})) acc = (attrVal . head . filter g $ elAttribs e) : acc
@@ -38,6 +54,8 @@ memberRefs = foldr f [] . elContent
         g (Attr (QName { qName = "ref" }) _) = True
         g _ = False
 
+-- | Find all the spanning trees of this (multi) graph.
+-- Consider: osm fpath >>= mapM_ print . relTree
 relTree :: T.Text -> Forest String
 relTree t = map (fmap (first . key)) $ dfs g (topSort g)
   where (g, key, _) = graphFromEdges trips
