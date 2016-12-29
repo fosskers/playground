@@ -5,19 +5,21 @@ resolver: lts-7.4
 
 # Local packages, usually specified by relative directory name
 packages:
-  - extensible-effects/
-  - linear/
+  - concurrent/
+  - discrimination/
   - eigen/
+  - extensible-effects/
+  - ghc8/
+  - json-stream/
+  - linear/
   - matrices/
   - microlens/
-  - ghc8/
   - pipes/
-  - json-stream/
-  - discrimination/
+  - rank2types/
   - repa/
-  - concurrent/
   - stm/
   - xml/
+  - lens/
   #  - servant/
 
 # Packages to be pulled from upstream that are not in the resolver (e.g., acme-missiles-0.3)

@@ -1,18 +1,21 @@
+{-# LANGUAGE Rank2Types #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TupleSections #-}
 {-# LANGUAGE OverloadedLists #-}
+
+module Lens where
 
 -- Blog post explaining how Lenses are derived:
 -- http://blog.jakubarnold.cz/2014/07/14/lens-tutorial-introduction-part-1.html
 
 import           Control.Applicative ((<$>),(<*>))
 import           Control.Lens
-import           Data.Functor.Identity
-import           Data.HashMap.Lazy hiding (map)
+import qualified Data.HashMap.Lazy as HM
 import           Data.Monoid
 import           Data.Text (Text)
 import qualified Data.Text as T
-import           Data.Text.Lens
+import           Data.Tree
+import           Data.Tree.Lens
 
 ---
 
@@ -69,7 +72,7 @@ m :: Lens' (a,b) b
 m f (a,b) = fmap (a,) $ f b
 
 -- `%~` takes a pure transformation and sets with that.
-n :: HashMap Int (Int,Int,Int) --[(Integer,Integer)]
+n :: HM.HashMap Int (Int,Int,Int) --[(Integer,Integer)]
 n = [(0,(1,2,3)),(1,(3,4,5))] & mapped . each %~ succ
 
 -- `.~` sets to a given value.
@@ -100,7 +103,7 @@ In `Control.Lens.Traversal`, we have:
 
 While a Traversal isn't quite a Fold, it _can_ be used for Getting
 like a Fold, because given a Monoid m, we have an Applicative for (Const m).
--} 
+-}
 goDeep :: Traversal' [User] Text
 goDeep = traverse . posts . traverse . title
 
@@ -125,3 +128,42 @@ manualSet :: Text -> [User]
 manualSet b = map f users
     where f (User n ps) = User n $ map g ps
           g (Post _)    = Post b
+
+--------
+-- Trees
+--------
+p :: Show a => Tree a -> IO ()
+p = putStrLn . drawTree . fmap show
+
+tree :: Tree Int
+tree = Node 1
+  [ Node 2
+    [ Node 4 []
+    , Node 5 []
+    ]
+  , Node 3 []
+  ]
+
+list :: [Int]
+list = [1 .. 10]
+
+t :: Tree Int
+t = tree & deep (filtered (null . subForest) . root) .~ 99
+
+list' :: [Int]
+list' = list & deep'' (filtered (null . tail) . _head) .~ 99
+
+deep' :: Plated a => Traversal' a b -> Traversal' a b
+deep' t = failing t (plate . deep' t)
+
+t' :: Tree Int
+t' = tree & deep'' (filtered (null . subForest) . root) .~ 99
+
+deepOf' ::
+  (Conjoined p, Applicative f) =>
+  ((s -> f t) -> s -> f t)
+  -> Traversing p f s t a b -> p a (f b) -> s -> f t
+deepOf' t1 t2 = failing t2 (t1 . deepOf' t1 t2)
+
+deep'' :: Plated a => Traversal' a b -> Traversal' a b
+deep'' = deepOf' plate

@@ -74,16 +74,31 @@ fpath = "/home/colin/code/playground/haskell/xml/baarle-nassau.osm"
 first :: (a,b,c) -> a
 first (a,_,_) = a
 
-foo :: Tree String
-foo = head . map (fmap (show . first . key)) $ dfs g (topSort g)
-  where (g, key, _) = graphFromEdges [ (1, 1, [2,3])
-                                     , (2, 2, [4])
-                                     , (3, 3, [4])
-                                     , (4, 4, [5, 6])
-                                     , (5, 5, [7,2])
-                                     , (6, 6, [7])
-                                     , (7, 7, [])
-                                     ]
+nassau = graphFromEdges [ (52411, 52411, [53136, 53134])
+                        , (53136, 53136, [53134])
+                        , (53134, 53134, [53114])
+                        , (53114, 53114, [2524404])
+                        , (2524404, 2524404, [53137])
+                        , (53137, 53137, [])
+                        ]
+
+graphy :: (Graph, Vertex -> (Integer, Integer, [Integer]), Integer -> Maybe Vertex)
+graphy = graphFromEdges [ (1, 1, [2,3])
+                        , (2, 2, [4])
+                        , (3, 3, [4])
+                        , (4, 4, [])
+                        , (5, 5, [6,7])
+                        , (6, 6, [8])
+                        , (7, 7, [8])
+                        , (8, 8, [])
+                        ]
+
+foo :: [Tree String]
+foo = map (fmap (show . first . key)) $ dfs g (topSort g)
+  where (g, key, _) = graphy
+
+bar :: (Graph, Vertex -> (b, b1, c), t) -> [Tree b]
+bar (g, key, _) = map (fmap (first . key)) . dfs g $ topSort g
 
 {-
 
