@@ -1,20 +1,20 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeApplications #-}
 
-module Streaming where
+module PGPipes where
 
-import Pipes
-import Pipes.Parse
-import Pipes.Aeson
+import           Data.Aeson hiding (decode)
+import           Data.ByteString (ByteString)
+import           Data.Functor.Identity
+import           Lens.Micro hiding (each)
+import           Lens.Micro.Aeson
+import           Lens.Micro.Mtl
+import           Pipes
+import           Pipes.Aeson
 import qualified Pipes.Aeson.Unchecked as A
-import qualified Pipes.Prelude as P
 import qualified Pipes.ByteString as P
-import Data.ByteString (ByteString)
-import Data.Aeson hiding (decode)
-import Lens.Micro hiding (each)
-import Lens.Micro.Aeson
-import Lens.Micro.Mtl
-import Data.Functor.Identity
+import           Pipes.Parse
+import qualified Pipes.Prelude as P
 
 ---
 
