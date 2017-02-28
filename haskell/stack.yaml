@@ -1,16 +1,19 @@
 # For more information, see: http://docs.haskellstack.org/en/stable/yaml_configuration.html
 
 # Specifies the GHC version and set of packages available (e.g., lts-3.5, nightly-2015-09-21, ghc-7.10.2)
-resolver: lts-7.15
+resolver: lts-7.19
 
 # Local packages, usually specified by relative directory name
 packages:
+  - attoparsec/
   - concurrent/
   - discrimination/
   - eigen/
   - extensible-effects/
+  - foldl/
   - ghc8/
   - json-stream/
+  - lens/
   - linear/
   - matrices/
   - microlens/
@@ -18,11 +21,8 @@ packages:
   - rank2types/
   - repa/
   - stm/
-  - xml/
-  - lens/
-  - foldl/
   - streaming/
-  #  - servant/
+  - xml/
 
 # Packages to be pulled from upstream that are not in the resolver (e.g., acme-missiles-0.3)
 extra-deps:
