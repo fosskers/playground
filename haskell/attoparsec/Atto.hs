@@ -2,7 +2,7 @@
 
 module Atto where
 
-import           Data.Attoparsec.ByteString
+import           Data.Attoparsec.ByteString.Char8
 import qualified Data.ByteString as B
 
 ---
@@ -21,7 +21,7 @@ i0 = "thisisaline"
 i1 :: B.ByteString
 i1 = "andthisisanother"
 
--- | Accepts any `Word8`.
+-- | Accepts any `Char`.
 p0 :: Parser B.ByteString
 p0 = takeWhile1 (const True)
 
@@ -39,3 +39,27 @@ r2 :: IO (Either String B.ByteString)
 r2 = eitherResult <$> parseWith B.getLine p0 i0
 
 -- Otherwise, a similar API to Parsec is exposed.
+
+----------------
+-- SIMPLE PARSER
+----------------
+
+c :: B.ByteString
+c = "name: Jack, age: 3, cool: 10"
+
+data Cat = Cat { _name :: B.ByteString, _age :: Int, _cool :: Double } deriving (Show)
+
+-- | Parse a `Cat`.
+cat :: Parser Cat
+cat = Cat <$> (name <* ", ") <*> (age <* ", ") <*> cool
+
+name :: Parser B.ByteString
+name = "name: " *> takeTill (== ',')
+
+age :: Parser Int
+age = "age: " *> decimal
+
+cool :: Parser Double
+cool = "cool: " *> double
+
+-- Run with: parseOnly cat c
