@@ -3,7 +3,11 @@
 module Atto where
 
 import           Data.Attoparsec.ByteString.Char8
+import qualified Data.Attoparsec.ByteString.Streaming as A
 import qualified Data.ByteString as B
+import qualified Data.ByteString.Streaming.Char8 as Q
+import           Streaming
+import qualified Streaming.Prelude as S
 
 ---
 
@@ -45,7 +49,7 @@ r2 = eitherResult <$> parseWith B.getLine p0 i0
 ----------------
 
 c :: B.ByteString
-c = "name: Jack, age: 3, cool: 10"
+c = "name: Jack, age: 3, cool: 10arsoitens"
 
 data Cat = Cat { _name :: B.ByteString, _age :: Int, _cool :: Double } deriving (Show)
 
@@ -63,3 +67,21 @@ cool :: Parser Double
 cool = "cool: " *> double
 
 -- Run with: parseOnly cat c
+
+--------------------
+-- STREAMING PARSING
+--------------------
+
+-- A streaming ByteString.
+cs :: Q.ByteString IO ()
+cs = "name: Jack, age: 3, cool: 10name: Qtip, age: 9, cool: 8"
+
+-- | Example of `parsed`, which yields a proper `Stream (Of a)` stream
+-- of the results of the parser.
+s0 :: IO ()
+s0 = void . S.print $ A.parsed cat cs
+
+-- | Example of `parse`, which will yield a single parsed value in the parent
+-- Monad, as well as the rest of the `ByteString` stream.
+s1 :: IO ()
+s1 = A.parse cat cs >>= print . fst
