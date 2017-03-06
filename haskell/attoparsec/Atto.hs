@@ -80,14 +80,12 @@ cs = "name: Jack, age: 3, cool: 10name: Qtip, age: 9, cool: 8"
 
 -- | Example of `parsed`, which yields a proper `Stream (Of a)` stream
 -- of the results of the parser.
+-- Run with: S.print s0
 s0 :: Stream (Of Cat) IO ()
 s0 = void $ A.parsed cat cs
 
--- Run with: S.print s0
-
 -- | Example of `parse`, which will yield a single parsed value in the
 -- parent Monad, as well as the rest of the `ByteString` stream.
+-- Run with: s1 >>= print . fst
 s1 :: IO (Either Cat A.Message, Q.ByteString IO ())
 s1 = A.parse cat cs
-
--- Run with: s1 >>= print . fst
