@@ -48,8 +48,9 @@ r2 = eitherResult <$> parseWith B.getLine p0 i0
 -- SIMPLE PARSER
 ----------------
 
+-- Some garbage on the end, added on purpose.
 c :: B.ByteString
-c = "name: Jack, age: 3, cool: 10arsoitens"
+c = "name: Jack, age: 3, cool: 10arsoitensarositna"
 
 data Cat = Cat { _name :: B.ByteString, _age :: Int, _cool :: Double } deriving (Show)
 
@@ -72,16 +73,21 @@ cool = "cool: " *> double
 -- STREAMING PARSING
 --------------------
 
--- A streaming ByteString.
+-- | A streaming ByteString. The parser finds the split between `10` and
+-- `name` automatically without error.
 cs :: Q.ByteString IO ()
 cs = "name: Jack, age: 3, cool: 10name: Qtip, age: 9, cool: 8"
 
 -- | Example of `parsed`, which yields a proper `Stream (Of a)` stream
 -- of the results of the parser.
-s0 :: IO ()
-s0 = void . S.print $ A.parsed cat cs
+s0 :: Stream (Of Cat) IO ()
+s0 = void $ A.parsed cat cs
 
--- | Example of `parse`, which will yield a single parsed value in the parent
--- Monad, as well as the rest of the `ByteString` stream.
-s1 :: IO ()
-s1 = A.parse cat cs >>= print . fst
+-- Run with: S.print s0
+
+-- | Example of `parse`, which will yield a single parsed value in the
+-- parent Monad, as well as the rest of the `ByteString` stream.
+s1 :: IO (Either Cat A.Message, Q.ByteString IO ())
+s1 = A.parse cat cs
+
+-- Run with: s1 >>= print . fst
