@@ -157,7 +157,7 @@ l2 = trace "Will this work?" >> send (putStrLn "I hope so")
 -------------------
 -- | Our effect stack, explicitely defined with no existential `r`.
 -- Note: This constrains the unwrapping order.
-type Effects = Eff (Writer String ': State [Dilithium] ': Exc String ': IO ': '[])
+type Effects = Eff '[Writer String, State [Dilithium], Exc String, IO]
 
 data Dilithium = Dilithium
 
