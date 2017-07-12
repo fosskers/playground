@@ -4,7 +4,7 @@ import org.apache.spark._
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql._
 import org.apache.spark.sql.hive._
-import org.apache.log4j.{Level, Logger}
+import org.apache.log4j.{ Level, Logger }
 
 // --- //
 
@@ -36,6 +36,14 @@ object Orc extends App {
     /* A lazy reader of some sort */
     val data: DataFrame = hc.read.format("orc").load("uku.orc")
 
+    /* Example of how to manually control what each column becomes */
+    val foo: RDD[(Long, BigDecimal, BigDecimal)] =
+      data
+        .select("id", "lat", "lon")
+        .where("type = 'node'")
+        .map(row => (row.getAs[Long]("id"), row.getAs[BigDecimal]("lat"), row.getAs[BigDecimal]("lon")))
+        .rdd
+
     val nodes: RDD[Node] =
       data
         .select("id", "tags", "lat", "lon")
@@ -56,7 +64,7 @@ object Orc extends App {
 
     val relations: RDD[Relation] =
       data
-        .select($"id", $"tags", $"members")  // Why are the `$` necessary?
+        .select("id", "tags", "members")
         .where("type = 'relation'")
         .as[Relation]
         .rdd
