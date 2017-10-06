@@ -1,0 +1,14 @@
+name:                pg-recursion-schemes
+version:             0.1.0.0
+license:             BSD3
+author:              Colin Woodbury
+maintainer:          colingw@gmail.com
+
+dependencies:
+  - base >= 4.7 && < 5
+  - data-ordlist >= 0.4 && < 0.5
+  - pretty
+  - recursion-schemes >= 5.0 && < 5.1
+
+library:
+  source-dirs:      .
