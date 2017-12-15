@@ -56,6 +56,8 @@ object Visualize extends CommandApp(
 
       geotiff.write("tiffy.tiff")
 
+      sc.stop()
+
     }
   }
 )
