@@ -18,7 +18,7 @@ library
   exposed-modules:     PGPipes
   -- other-modules:
   -- other-extensions:
-  build-depends:       base >=4.8 && <4.10
+  build-depends:       base >=4.8 && <4.12
                      , pipes >= 4.1 && < 4.4
                      , pipes-parse >= 3.0 && < 3.1
                      , pipes-aeson >= 0.4 && < 0.5

@@ -1,6 +1,8 @@
--- This file has been generated from package.yaml by hpack version 0.17.0.
+-- This file has been generated from package.yaml by hpack version 0.20.0.
 --
 -- see: https://github.com/sol/hpack
+--
+-- hash: a664a66ac657d3691b32f992f334f19e47170eafb3f7734ad70dac57ef86c74d
 
 name:           pg-recursion-schemes
 version:        0.1.0.0
@@ -14,11 +16,13 @@ library
   hs-source-dirs:
       ./.
   build-depends:
-      base >= 4.7 && < 5
-    , data-ordlist >= 0.4 && < 0.5
+      base >=4.7 && <5
+    , data-ordlist >=0.4 && <0.5
     , pretty
-    , recursion-schemes >= 5.0 && < 5.1
+    , recursion-schemes >=5.0 && <5.1
   exposed-modules:
       RS
       RS2
+  other-modules:
+      Paths_pg_recursion_schemes
   default-language: Haskell2010

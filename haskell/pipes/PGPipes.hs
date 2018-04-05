@@ -8,11 +8,8 @@ import           Data.ByteString (ByteString)
 import           Data.Functor.Identity
 import           Lens.Micro hiding (each)
 import           Lens.Micro.Aeson
-import           Lens.Micro.Mtl
 import           Pipes
 import           Pipes.Aeson
-import qualified Pipes.Aeson.Unchecked as A
-import qualified Pipes.ByteString as P
 import           Pipes.Parse
 import qualified Pipes.Prelude as P
 

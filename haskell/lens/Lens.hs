@@ -19,8 +19,8 @@ import           Data.Tree.Lens
 
 ---
 
-f :: [[(Text,Text)]] -> Sum Int
-f s = s ^. traverse . traverse . _1 . to (Sum . T.length)
+fun :: [[(Text,Text)]] -> Sum Int
+fun s = s ^. traverse . traverse . _1 . to (Sum . T.length)
 
 s1 :: [[(Text,Text)]]
 s1 = [[("this","is good")]]
@@ -43,7 +43,7 @@ s3 = [(1,1),(2,2),(3,3),(4,4),(5,5)]
 
 -- Will fold the contents of most things.
 h :: (Each t t a a, Monoid a) => t -> a
-h t = t ^. each  -- == foldOf each t == view each t
+h x = x ^. each  -- == foldOf each t == view each t
 
 i :: (Each t t a a, Num a) => [t] -> a
 i = sum . map (productOf each)
@@ -72,8 +72,8 @@ m :: Lens' (a,b) b
 m f (a,b) = fmap (a,) $ f b
 
 -- `%~` takes a pure transformation and sets with that.
-n :: HM.HashMap Int (Int,Int,Int) --[(Integer,Integer)]
-n = [(0,(1,2,3)),(1,(3,4,5))] & mapped . each %~ succ
+n0 :: HM.HashMap Int (Int,Int,Int) --[(Integer,Integer)]
+n0 = [(0,(1,2,3)),(1,(3,4,5))] & mapped . each %~ succ
 
 -- `.~` sets to a given value.
 o :: [(Integer,Integer)]
@@ -132,8 +132,8 @@ manualSet b = map f users
 --------
 -- Trees
 --------
-p :: Show a => Tree a -> IO ()
-p = putStrLn . drawTree . fmap show
+p0 :: Show a => Tree a -> IO ()
+p0 = putStrLn . drawTree . fmap show
 
 tree :: Tree Int
 tree = Node 1
@@ -147,8 +147,8 @@ tree = Node 1
 list :: [Int]
 list = [1 .. 10]
 
-t :: Tree Int
-t = tree & deep (filtered (null . subForest) . root) .~ 99
+t0 :: Tree Int
+t0 = tree & deep (filtered (null . subForest) . root) .~ 99
 
 list' :: [Int]
 list' = list & deep'' (filtered (null . tail) . _head) .~ 99

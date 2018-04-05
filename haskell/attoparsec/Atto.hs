@@ -7,7 +7,6 @@ import qualified Data.Attoparsec.ByteString.Streaming as A
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Streaming.Char8 as Q
 import           Streaming
-import qualified Streaming.Prelude as S
 
 ---
 
@@ -87,5 +86,5 @@ s0 = void $ A.parsed cat cs
 -- | Example of `parse`, which will yield a single parsed value in the
 -- parent Monad, as well as the rest of the `ByteString` stream.
 -- Run with: s1 >>= print . fst
-s1 :: IO (Either Cat A.Message, Q.ByteString IO ())
+s1 :: IO (Either A.Errors Cat, Q.ByteString IO ())
 s1 = A.parse cat cs

@@ -2,7 +2,6 @@ module Foldl where
 
 import qualified Control.Foldl as F
 import           Control.Lens
-import           Control.Parallel.Strategies
 import           Data.Vector (Vector)
 
 ---

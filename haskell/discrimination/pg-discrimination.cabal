@@ -18,7 +18,7 @@ executable pg-discrimination
   main-is:             Discrimination.hs
   -- other-modules:
   -- other-extensions:
-  build-depends:       base >=4.8 && <4.10
+  build-depends:       base >=4.8 && <4.12
                      , discrimination >= 0.2 && < 0.3
                      , criterion
                      , containers

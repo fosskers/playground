@@ -17,7 +17,7 @@ library
   exposed-modules:     PGStreaming
   -- other-modules:
   -- other-extensions:
-  build-depends:       base >=4.9 && <4.10
-                     , streaming >= 0.1 && < 0.2
+  build-depends:       base >=4.9 && <4.12
+                     , streaming >= 0.1 && < 0.3
   -- hs-source-dirs:
   default-language:    Haskell2010

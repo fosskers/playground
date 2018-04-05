@@ -1,18 +1,18 @@
-resolver: lts-8.24
+resolver: lts-11.3
 
-# Local packages, usually specified by relative directory name
 packages:
   - attoparsec/
   - concurrent/
   - discrimination/
   - eigen/
-  - extensible-effects/
+  # - extensible-effects/
   - foldl/
-  - freer-effects/
+  # - freer-effects/
   - ghc8/
   - json-stream/
   - lens/
   - linear/
+  - massiv/
   - matrices/
   - microlens/
   - pipes/
@@ -20,16 +20,13 @@ packages:
   - recursion-schemes
   - repa/
   - stm/
-  - streaming/
+  # - streaming/
   - xml/
 
 extra-deps:
   - random-eff-0.1.0.1
-  - eigen-2.1.6
-  - pipes-aeson-0.4.1.7
+  - eigen-2.1.7
+  - freer-effects-0.3.0.1
   - discrimination-0.2.1
   - promises-0.3
-
-flags: {}
-
-extra-package-dbs: []
+  - streaming-attoparsec-1.0.0

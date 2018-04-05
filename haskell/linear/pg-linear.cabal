@@ -9,7 +9,7 @@ library
   exposed-modules:     Linear
   -- other-modules:
   -- other-extensions:
-  build-depends:       base >=4.8 && <4.10
+  build-depends:       base >=4.8 && <4.12
                      , microlens < 0.5
                      , linear < 2
   -- hs-source-dirs:
