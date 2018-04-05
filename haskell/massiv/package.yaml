@@ -1,0 +1,23 @@
+name:                pg-massiv
+version:             1.0.0
+author:              Colin Woodbury
+maintainer:          colin@fosskers.ca
+copyright:           2011 - 2018 Colin Woodbury
+category:            Data
+
+ghc-options:
+  - -fwarn-unused-imports
+  - -fwarn-unused-binds
+  - -fwarn-name-shadowing
+  - -fwarn-unused-matches
+  - -fwarn-incomplete-patterns
+  - -fwarn-incomplete-uni-patterns
+
+dependencies:
+  - base >= 4.7 && < 5
+  - massiv >= 0.1 && < 0.2
+  - vector
+
+library:
+  source-dirs: .
+  other-modules: []

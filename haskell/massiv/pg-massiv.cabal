@@ -1,0 +1,25 @@
+-- This file has been generated from package.yaml by hpack version 0.20.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: d8c6c6440326bf37c9cd9928f83a5e6d006d23fa705a13cf58befd011ca13bf6
+
+name:           pg-massiv
+version:        1.0.0
+category:       Data
+author:         Colin Woodbury
+maintainer:     colin@fosskers.ca
+copyright:      2011 - 2018 Colin Woodbury
+build-type:     Simple
+cabal-version:  >= 1.10
+
+library
+  hs-source-dirs:
+      ./.
+  ghc-options: -fwarn-unused-imports -fwarn-unused-binds -fwarn-name-shadowing -fwarn-unused-matches -fwarn-incomplete-patterns -fwarn-incomplete-uni-patterns
+  build-depends:
+      base >=4.7 && <5
+    , massiv >=0.1 && <0.2
+  exposed-modules:
+      Massiv
+  default-language: Haskell2010
