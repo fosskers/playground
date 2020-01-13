@@ -1,8 +1,10 @@
--- This file has been generated from package.yaml by hpack version 0.20.0.
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.31.2.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: a664a66ac657d3691b32f992f334f19e47170eafb3f7734ad70dac57ef86c74d
+-- hash: d887e599ac067ba94b125a61b85243ccd3b908c8c46af7fb8f143dcad90665d6
 
 name:           pg-recursion-schemes
 version:        0.1.0.0
@@ -10,7 +12,6 @@ author:         Colin Woodbury
 maintainer:     colingw@gmail.com
 license:        BSD3
 build-type:     Simple
-cabal-version:  >= 1.10
 
 library
   hs-source-dirs:
@@ -19,10 +20,26 @@ library
       base >=4.7 && <5
     , data-ordlist >=0.4 && <0.5
     , pretty
-    , recursion-schemes >=5.0 && <5.1
+    , recursion-schemes >=5.0 && <5.2
   exposed-modules:
       RS
       RS2
+      RS3
   other-modules:
       Paths_pg_recursion_schemes
+  default-language: Haskell2010
+
+benchmark rs-bench
+  type: exitcode-stdio-1.0
+  main-is: Bench.hs
+  hs-source-dirs:
+      bench
+  ghc-options: -threaded -O2
+  build-depends:
+      base >=4.7 && <5
+    , criterion >=1.1 && <1.4
+    , data-ordlist >=0.4 && <0.5
+    , pg-recursion-schemes
+    , pretty
+    , recursion-schemes >=5.0 && <5.2
   default-language: Haskell2010

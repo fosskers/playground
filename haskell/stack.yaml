@@ -1,10 +1,10 @@
-resolver: lts-11.3
+resolver: lts-14.20
 
 packages:
   - attoparsec/
   - concurrent/
-  - discrimination/
-  - eigen/
+  # - discrimination/
+  # - eigen/
   # - extensible-effects/
   - foldl/
   # - freer-effects/
@@ -12,21 +12,16 @@ packages:
   - json-stream/
   - lens/
   - linear/
-  - massiv/
-  - matrices/
+  # - massiv/
+  # - matrices/
   - microlens/
   - pipes/
   - rank2types/
   - recursion-schemes
-  - repa/
+  # - repa/
   - stm/
   # - streaming/
   - xml/
 
 extra-deps:
-  - random-eff-0.1.0.1
-  - eigen-2.1.7
-  - freer-effects-0.3.0.1
-  - discrimination-0.2.1
-  - promises-0.3
-  - streaming-attoparsec-1.0.0
+  - json-stream-0.4.2.4

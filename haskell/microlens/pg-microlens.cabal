@@ -18,7 +18,7 @@ executable pg-microlens
   main-is:             Text.hs
   -- other-modules:
   -- other-extensions:
-  build-depends:       base >=4.8 && <4.12
+  build-depends:       base >=4.8 && <4.14
                      , text
                      , criterion
                      , microlens-platform

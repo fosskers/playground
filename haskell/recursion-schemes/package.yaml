@@ -8,7 +8,19 @@ dependencies:
   - base >= 4.7 && < 5
   - data-ordlist >= 0.4 && < 0.5
   - pretty
-  - recursion-schemes >= 5.0 && < 5.1
+  - recursion-schemes >= 5.0 && < 5.2
 
 library:
   source-dirs:      .
+
+benchmarks:
+  rs-bench:
+    main: Bench.hs
+    source-dirs: bench
+    other-modules: []
+    ghc-options:
+      - -threaded
+      - -O2
+    dependencies:
+      - criterion >= 1.1 && < 1.4
+      - pg-recursion-schemes

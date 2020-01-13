@@ -18,7 +18,7 @@ library
   exposed-modules:     Eff
   -- other-modules:
   other-extensions:    ConstraintKinds, ScopedTypeVariables, FlexibleContexts
-  build-depends:       base >=4.8 && <4.12
+  build-depends:       base >=4.8 && <4.14
                      , extensible-effects
 
   -- hs-source-dirs:

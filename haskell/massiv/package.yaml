@@ -15,7 +15,7 @@ ghc-options:
 
 dependencies:
   - base >= 4.7 && < 5
-  - massiv >= 0.1 && < 0.2
+  - massiv >= 0.1 && < 0.5
   - vector
 
 library:
